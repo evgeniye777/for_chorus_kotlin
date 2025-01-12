@@ -21,16 +21,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <Button
+        android:id="@+id/butWrite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Записать">
 
     </Button>
 </LinearLayout>
-    <GridView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/gvMain"
         android:layout_width="match_parent"
+        android:listSelector="@drawable/rect2"
         android:layout_height="wrap_content"
         android:layout_marginTop="55dp">
-    </GridView>
+    </androidx.recyclerview.widget.RecyclerView>
 </FrameLayout>

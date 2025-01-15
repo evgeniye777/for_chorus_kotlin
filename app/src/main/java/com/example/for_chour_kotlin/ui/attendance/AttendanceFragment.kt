@@ -42,7 +42,7 @@ public class AttendanceFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         writeMDB = WriteMDB(activity)
-        masSpinner = writeMDB.readSpinerMas()
+        masSpinner = writeMDB.readSpinerMas("15.01.2025")
         personsList = writeMDB.readPersonMas()
     }
     override fun onCreateView(
@@ -59,6 +59,7 @@ public class AttendanceFragment : Fragment() {
         vivod(""+masSpinner.size)
         mPersonsRec = binding.gvMain
         mPersonsRec.setLayoutManager(GridLayoutManager(activity,3))
+
         updateUI()
         butWrite = binding.butWrite
         butWrite.setOnClickListener {
@@ -80,8 +81,9 @@ public class AttendanceFragment : Fragment() {
             mAdapter = PersonsAdapter(personsList)
             mPersonsRec.setAdapter(mAdapter)
         } else {
-            mAdapter!!.setSborniks(personsList)
+            mAdapter!!.setListPersons(personsList)
             mAdapter!!.notifyDataSetChanged()
+            mPersonsRec.setAdapter(mAdapter)
         }
     }
     class PersonHolder:
@@ -114,9 +116,9 @@ public class AttendanceFragment : Fragment() {
 
     inner class PersonsAdapter(sbornickk: List<infoOnePerson>) :
         RecyclerView.Adapter<PersonHolder>() {
-        private var mSbornick: List<infoOnePerson>
+        private var mListPersons: List<infoOnePerson>
         init {
-            mSbornick = sbornickk
+            mListPersons = sbornickk
         }
 
         override fun onCreateViewHolder(
@@ -134,16 +136,20 @@ public class AttendanceFragment : Fragment() {
             holder: PersonHolder,
             position: Int
         ) {
-            val infoOneSbornickk: infoOnePerson = mSbornick[position]
+            val infoOneSbornickk: infoOnePerson = mListPersons[position]
             holder.bind(infoOneSbornickk)
         }
 
         override fun getItemCount(): Int {
-            return mSbornick.size
+            return mListPersons.size
         }
 
-        fun setSborniks(sborniks: List<infoOnePerson>) {
-            mSbornick = sborniks
+        fun setListPersons(spersons: List<infoOnePerson>) {
+            mListPersons = spersons
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
     }
 }

@@ -27,8 +27,9 @@ public class AttendanceFragment : Fragment() {
     var serverClass = ServerClass()
     lateinit var writeMDB: WriteMDB
     lateinit var masSpinner: List<String>
-    lateinit var masPersson: List<String>
+    lateinit var masPurpose: List<String>
     lateinit var adapterSpinner: ArrayAdapter<String>
+    lateinit var adapterPurpose: ArrayAdapter<String>
     lateinit var personsList: List<infoOnePerson>
 
 
@@ -37,6 +38,7 @@ public class AttendanceFragment : Fragment() {
     lateinit var mPersonsRec: RecyclerView
     lateinit var butWrite: Button
     lateinit var spinnerDate: Spinner
+    lateinit var spinnerPurpose: Spinner
 
     private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,14 +58,21 @@ public class AttendanceFragment : Fragment() {
         spinnerDate = binding.spinnerDate
         adapterSpinner = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masSpinner)
         spinnerDate.adapter = adapterSpinner
-        vivod(""+masSpinner.size)
+
+        spinnerPurpose = binding.spinnerPurpose
+        masPurpose = listOf("Общий", "Сестринский", "Братский","Служение")
+        //masPurpose.add("Общий"); masPurpose.add("Сестринский"); masPurpose.add("Братский"); masPurpose.plus("Служение")
+        adapterPurpose = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masPurpose)
+        spinnerPurpose.adapter = adapterPurpose
+
+        //vivod(""+masSpinner.size)
         mPersonsRec = binding.gvMain
         mPersonsRec.setLayoutManager(GridLayoutManager(activity,3))
 
         updateUI()
         butWrite = binding.butWrite
         butWrite.setOnClickListener {
-            writeMDB.writeSt("",0,personsList)
+            writeMDB.writeSt("10.01.2025",spinnerPurpose.selectedItemPosition ,personsList)
         } //gridView.setOnClickListener { itemListener }
         return root
     }
@@ -114,11 +123,11 @@ public class AttendanceFragment : Fragment() {
         }
     }
 
-    inner class PersonsAdapter(sbornickk: List<infoOnePerson>) :
+    inner class PersonsAdapter(listPersons: List<infoOnePerson>) :
         RecyclerView.Adapter<PersonHolder>() {
         private var mListPersons: List<infoOnePerson>
         init {
-            mListPersons = sbornickk
+            mListPersons = listPersons
         }
 
         override fun onCreateViewHolder(
@@ -136,8 +145,8 @@ public class AttendanceFragment : Fragment() {
             holder: PersonHolder,
             position: Int
         ) {
-            val infoOneSbornickk: infoOnePerson = mListPersons[position]
-            holder.bind(infoOneSbornickk)
+            val infoOnePerson1: infoOnePerson = mListPersons[position]
+                holder.bind(infoOnePerson1)
         }
 
         override fun getItemCount(): Int {

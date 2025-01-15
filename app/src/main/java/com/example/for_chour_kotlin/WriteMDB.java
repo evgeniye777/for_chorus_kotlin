@@ -34,10 +34,11 @@ public class WriteMDB {
         List<String> mas = new ArrayList<>();
         Cursor cursor;
         cursor = mdb.rawQuery("SELECT * FROM " + "st", null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+        cursor.moveToLast();
+        mas.add("Сегодня");
+        while (!cursor.isBeforeFirst()) {
             mas.add(cursor.getString(2).toString());
-            cursor.moveToNext();
+            cursor.moveToPrevious();
         }
         return mas;
     }
@@ -47,9 +48,11 @@ public class WriteMDB {
         cursor = mdb.rawQuery("SELECT * FROM " + "persons", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            infoOnePerson infoPerson = new infoOnePerson(cursor.getString(5),0);
+            int id = Integer.parseInt(cursor.getString(0));
+            infoOnePerson infoPerson = new infoOnePerson(id,cursor.getString(5),0);
             infoPerson.setGender(Integer.parseInt(cursor.getString(6)));
-            mas.add(infoPerson);
+            infoPerson.setAllowed(Integer.parseInt(cursor.getString(7)));
+            if (infoPerson.getAllowed()==0||infoPerson.getAllowed()==1)  mas.add(infoPerson);
             cursor.moveToNext();
         }
         return mas;
@@ -60,24 +63,20 @@ public class WriteMDB {
        updateST(date,gender,list);
     }
 
-    private ContentValues getContentValuesST(String date,int gender,List<infoOnePerson> list) {
+    private ContentValues getContentValuesST(String date,int purpose,List<infoOnePerson> list) {
         ContentValues values = new ContentValues();
-        values.put("", date);
         values.put("version", "-1");
         values.put("date", date);
-        values.put("gender", gender);
-        int n = 1;
+        values.put("purpose", purpose);
         for (infoOnePerson s: list) {
-            if (s.getState()==1) {values.put("c"+n, "p");}
+            if (s.getState()==1) {values.put("c"+s.getId(), "p");}
             else {
-                if (gender==0||gender==s.getGender()) {values.put("c"+n, "n");}
-                else {values.put("c"+n, "d");}
+                    if (purpose == 0 || purpose == 3 && s.getAllowed() == 1 || purpose == s.getGender()) {
+                        values.put("c" + s.getId(), "n");
+                    } else {
+                        values.put("c" + s.getId(), "d");
+                    }
             }
-            n++;
-        }
-        while(n<=50) {
-            values.put("c"+n, "");
-            n++;
         }
         vivod(""+values.size());
         return values;

@@ -9,21 +9,35 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:gravity="center"
+    android:gravity="start"
     android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:gravity="start"
+        android:layout_height="wrap_content">
     <Spinner
         android:id="@+id/spinnerDate"
-        android:layout_gravity="center"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="7dp"
-        android:layout_marginBottom="7dp"
-        android:layout_marginRight="30dp"
+        android:layout_gravity="start"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:minWidth="190dp"
+        android:layout_height="wrap_content"/>
+    <Spinner
+        android:id="@+id/spinnerPurpose"
+        android:layout_gravity="start"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="wrap_content"
+        android:minWidth="190dp"
+        android:layout_height="wrap_content"  />
+    </LinearLayout>
     <Button
         android:id="@+id/butWrite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
         android:text="Записать">
 
     </Button>
@@ -33,6 +47,6 @@
         android:layout_width="match_parent"
         android:listSelector="@drawable/rect2"
         android:layout_height="wrap_content"
-        android:layout_marginTop="55dp">
+        android:layout_marginTop="100dp">
     </androidx.recyclerview.widget.RecyclerView>
 </FrameLayout>

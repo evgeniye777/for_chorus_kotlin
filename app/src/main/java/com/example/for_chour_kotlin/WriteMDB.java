@@ -1,7 +1,6 @@
 package com.example.for_chour_kotlin;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,15 +9,17 @@ import android.widget.Toast;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson;
+import com.example.for_chour_kotlin.PersonsInfo.infoOneRec;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class WriteMDB {
     private DataBases basa;
     static private SQLiteDatabase mdb;
+    private List<String> listSpinner;
+    private boolean iStoday = false;
     FragmentActivity activity;
    public WriteMDB(FragmentActivity content) {
        activity = content;
@@ -30,17 +31,40 @@ public class WriteMDB {
         } catch (SQLException mSQLException) {
             throw mSQLException;}
     }
-    public List<String> readSpinerMas(String toDay) {
-        List<String> mas = new ArrayList<>();
+    public List<infoOneRec> readOneRecMas(String toDay) {
+        List<infoOneRec> listinfoRec = new ArrayList<>();
+        listSpinner = new ArrayList<>();
         Cursor cursor;
         cursor = mdb.rawQuery("SELECT * FROM " + "st", null);
         cursor.moveToLast();
-        mas.add("Сегодня");
         while (!cursor.isBeforeFirst()) {
-            mas.add(cursor.getString(2).toString());
+            infoOneRec infoRec;
+            int id = Integer.parseInt(cursor.getString(0));
+            int version = Integer.parseInt(cursor.getString(1));
+            String date = cursor.getString(2);
+            if (date.equals(toDay)) {listSpinner.add("Сегодня"); iStoday = true;}
+            else {listSpinner.add(date);}
+            int purpose = Integer.parseInt(cursor.getString(3));
+            String c1 = cursor.getString(6);
+            infoRec = new infoOneRec(id,version,date,purpose);
+            List<String> listRec = new ArrayList<>();
+            int n=6;
+            while (n<56) {
+                String cur = cursor.getString(n);
+                if (cur==null) {cur="";}
+                listRec.add(cur);
+                n++;
+            }
+            infoRec.addToList(listRec);
+            listinfoRec.add(infoRec);
             cursor.moveToPrevious();
         }
-        return mas;
+        return listinfoRec;
+    }
+    public List<String> getSpinnerDay() {
+       if (!iStoday) {listSpinner.add(0,"Сегодня");}
+       if (listSpinner!=null) {return listSpinner;}
+       else {return new ArrayList<>();}
     }
     public List<infoOnePerson> readPersonMas() {
         List<infoOnePerson> mas = new ArrayList<>();
@@ -58,9 +82,9 @@ public class WriteMDB {
         return mas;
     }
 
-    public void writeSt(String date, int gender, List<infoOnePerson> list)
+    public void writeSt(String date, int purpose, List<infoOnePerson> list)
     {
-       updateST(date,gender,list);
+       updateST(date,purpose,list);
     }
 
     private ContentValues getContentValuesST(String date,int purpose,List<infoOnePerson> list) {
@@ -82,8 +106,8 @@ public class WriteMDB {
         return values;
     }
 
-    public void updateST(String date,int gender,List<infoOnePerson> list) {
-        ContentValues values = getContentValuesST(date,gender,list);
+    public void updateST(String date,int purpose,List<infoOnePerson> list) {
+        ContentValues values = getContentValuesST(date,purpose,list);
         vivod(""+mdb.insert("st",null,values));
     }
 

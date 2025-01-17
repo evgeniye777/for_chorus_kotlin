@@ -69,7 +69,7 @@ public class WriteMDB {
     public List<infoOnePerson> readPersonMas() {
         List<infoOnePerson> mas = new ArrayList<>();
         Cursor cursor;
-        cursor = mdb.rawQuery("SELECT * FROM " + "persons", null);
+        cursor = mdb.rawQuery("SELECT * FROM " + "persons"+" ORDER BY "+"name", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             int id = Integer.parseInt(cursor.getString(0));
@@ -84,7 +84,14 @@ public class WriteMDB {
 
     public void writeSt(String date, int purpose, List<infoOnePerson> list)
     {
-       updateST(date,purpose,list);
+        ContentValues values = getContentValuesST(date,purpose,list);
+        vivod(""+mdb.insert("st",null,values));
+    }
+
+    public void overWriteSt(String date, int purpose, List<String> list)
+    {
+        ContentValues values = getContentValuesSTover(date,purpose,list);
+        vivod(""+mdb.update("st",values,"date=?",new String[] {date}));
     }
 
     private ContentValues getContentValuesST(String date,int purpose,List<infoOnePerson> list) {
@@ -106,9 +113,18 @@ public class WriteMDB {
         return values;
     }
 
-    public void updateST(String date,int purpose,List<infoOnePerson> list) {
-        ContentValues values = getContentValuesST(date,purpose,list);
-        vivod(""+mdb.insert("st",null,values));
+    private ContentValues getContentValuesSTover(String date,int purpose,List<String> list) {
+        ContentValues values = new ContentValues();
+        values.put("version", "-1");
+        values.put("date", date);
+        values.put("purpose", purpose);
+        int n=1;
+        for (String s: list) {
+            values.put("c" + n, s);
+            n++;
+        }
+        vivod(""+values.size());
+        return values;
     }
 
     public void vivod(String s) {

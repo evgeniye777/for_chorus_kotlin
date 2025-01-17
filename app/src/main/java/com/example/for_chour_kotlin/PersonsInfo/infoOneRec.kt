@@ -7,16 +7,16 @@ class infoOneRec {
     var purpose: Int = -1
     lateinit var data: String
     lateinit var comments: String
-    lateinit var list: List<String>
+    lateinit var list: MutableList<String>
 
     constructor(id0: Int, version0: Int,date0: String,purpose0:Int)
     {
         id = id0; version = version0; date = date0; purpose = purpose0;
     }
-    fun addToList(c: List<String>) {
+    fun addToList(c: MutableList<String>) {
         list = c
     }
-    fun getRecList(): List<String> {
+    fun getRecList(): MutableList<String> {
         return list
     }
     fun getRecDate(): String {

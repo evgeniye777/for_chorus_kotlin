@@ -2,6 +2,8 @@ package com.example.for_chour_kotlin.ui.attendance
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.graphics.Color
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +26,7 @@ import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.ServerClass
 import com.example.for_chour_kotlin.WriteMDB
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
+import java.util.Date
 
 
 public class AttendanceFragment : Fragment() {
@@ -37,6 +41,9 @@ public class AttendanceFragment : Fragment() {
     lateinit var personsList: List<infoOnePerson>
     lateinit var listInfoRec: List<infoOneRec>
     var cursorRec: Int = -1
+    var Inplace: Int=0
+    var rStart: Boolean = true;
+
     var today: String = "14.01.2025"
 
 
@@ -46,10 +53,15 @@ public class AttendanceFragment : Fragment() {
     lateinit var butWrite: Button
     lateinit var spinnerDate: Spinner
     lateinit var spinnerPurpose: Spinner
+    lateinit var textInPlace: TextView
 
     private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var date: Date = Date();
+        var sdf:SimpleDateFormat = SimpleDateFormat("dd.MM.YYYY")
+        val dateString: String = sdf.format(date)
+        today = dateString
         writeMDB = WriteMDB(activity)
         listInfoRec = writeMDB.readOneRecMas(today)
         masSpinner = writeMDB.spinnerDay
@@ -60,9 +72,47 @@ public class AttendanceFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        rStart =true;
         _binding = FragmentAttendanceBinding.inflate(inflater, container, false)
         val root: View = binding.root
         //adapter = ArrayAdapter<String>(requireActivity(), R.layout.item, R.id.tvText,masPersson)
+        textInPlace = binding.textInplace
+        spinnerPurpose = binding.spinnerPurpose
+        masPurpose = listOf("Общий", "Сестринский", "Братский","Служение")
+        adapterPurpose = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masPurpose)
+        spinnerPurpose.adapter = adapterPurpose
+        spinnerPurpose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedItem = parent?.getItemAtPosition(position).toString()
+                updateUI()
+                rStart = false;
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Обработка случая, когда ничего не выбрано
+            }
+        }
+        //vivod(""+masSpinner.size)
+        mPersonsRec = binding.gvMain
+        mPersonsRec.setLayoutManager(GridLayoutManager(activity,2))
+
+        butWrite = binding.butWrite
+        butWrite.setOnClickListener {
+            var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
+            if (date.equals("Сегодня")) {date = today}
+
+            if (cursorRec==-1) {
+                writeMDB.writeSt(date,spinnerPurpose.selectedItemPosition ,personsList)
+            }else {
+                writeMDB.overWriteSt(date,spinnerPurpose.selectedItemPosition ,listInfoRec.get(cursorRec).getRecList())
+            }
+
+
+            listInfoRec = writeMDB.readOneRecMas(today)
+            masSpinner = writeMDB.spinnerDay
+            cursorRec = 0
+            if (!rStart) {updateUI()}
+        }
+
         spinnerDate = binding.spinnerDate
         adapterSpinner = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masSpinner)
         spinnerDate.adapter = adapterSpinner
@@ -81,44 +131,14 @@ public class AttendanceFragment : Fragment() {
                     spinnerPurpose.setSelection(listInfoRec.get(cursorRec).purpose)
                 }
                 else {spinnerPurpose.isEnabled = true;
-                    spinnerPurpose.setSelection(0)}
-                updateUI();
+                    spinnerPurpose.setSelection(0)
+                }
+                if (!rStart) {updateUI();}
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // Обработка случая, когда ничего не выбрано
             }
         }
-
-        spinnerPurpose = binding.spinnerPurpose
-        masPurpose = listOf("Общий", "Сестринский", "Братский","Служение")
-        adapterPurpose = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masPurpose)
-        spinnerPurpose.adapter = adapterPurpose
-        spinnerPurpose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedItem = parent?.getItemAtPosition(position).toString()
-                updateUI();
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Обработка случая, когда ничего не выбрано
-            }
-        }
-
-        //vivod(""+masSpinner.size)
-        mPersonsRec = binding.gvMain
-        mPersonsRec.setLayoutManager(GridLayoutManager(activity,3))
-
-        updateUI()
-        butWrite = binding.butWrite
-        butWrite.setOnClickListener {
-            var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
-            if (date.equals("Сегодня")) {date = today}
-            writeMDB.writeSt(date,spinnerPurpose.selectedItemPosition ,personsList)
-
-            listInfoRec = writeMDB.readOneRecMas(today)
-            masSpinner = writeMDB.spinnerDay
-            cursorRec = 0
-            updateUI()
-        } //gridView.setOnClickListener { itemListener }
         return root
     }
 
@@ -139,7 +159,10 @@ public class AttendanceFragment : Fragment() {
             mAdapter!!.notifyDataSetChanged()
             mPersonsRec.setAdapter(mAdapter)
         }
-        //if (cursorRec>=0) {vivodMes(listInfoRec.get(cursorRec).getRecList().joinToString())}
+        Inplace++;
+        textInPlace.setText(""+Inplace);
+        if (cursorRec>=0) {butWrite.text = "Перезаписать";butWrite.setBackgroundColor(resources.getColor(R.color.pereza))}
+        else {butWrite.text = "Записать"; butWrite.setBackgroundColor(resources.getColor(R.color.purple_500))}
     }
 
     fun vivodMes(s: String) {
@@ -174,20 +197,25 @@ public class AttendanceFragment : Fragment() {
 
         fun bind(sperson: infoOnePerson?) {
             mPerson = sperson
-            name?.text = ""+mPerson?.getId()+mPerson?.getName()
+            name?.text = mPerson?.getName()
             if (cursorRec==-1) {
             if (mPerson?.getState() ==0?: true) {
                 var purpose: Int = spinnerPurpose.selectedItemPosition
                 if (purpose==0||purpose==3&&mPerson?.getAllowed()==1||mPerson?.getGender()==purpose) { selectLayout?.setBackgroundResource(R.drawable.rect1)}
                 else {selectLayout?.setBackgroundResource(R.drawable.rect_gone)}
             }
-            else {selectLayout?.setBackgroundResource(R.drawable.rect2)}
+            else {selectLayout?.setBackgroundResource(R.drawable.rect2)
+                Inplace++;
+                textInPlace.setText(""+Inplace);
+            }
             } else {
                 var infoCs: List<String> = listInfoRec.get(cursorRec).getRecList()
                 var id: Int = mPerson?.getId() ?: 1
                 id--
                 if (infoCs.get(id).equals("p")) {
                     selectLayout?.setBackgroundResource(R.drawable.rect2)
+                    Inplace++;
+                    textInPlace.setText(""+Inplace);
                 }else if (infoCs.get(id).equals("n")) {
                     selectLayout?.setBackgroundResource(R.drawable.rect_not)
                 }
@@ -205,6 +233,21 @@ public class AttendanceFragment : Fragment() {
                         mPerson?.setState(1); selectLayout?.setBackgroundResource(R.drawable.rect2)
                     } else {
                         mPerson?.setState(0);selectLayout?.setBackgroundResource(R.drawable.rect1)
+                    }
+                }
+            }
+            else {
+                var purpose: Int = spinnerPurpose.selectedItemPosition
+                var listNow: MutableList<String>  = listInfoRec.get(cursorRec).getRecList()
+                var id: Int = mPerson?.getId() ?:1;
+                id--
+                if (purpose==0||purpose==3&&mPerson?.getAllowed()==1||mPerson?.getGender()==purpose) {
+                    if (listNow.get(id).equals("p")) {
+                       listNow.set(id,"n")
+                        selectLayout?.setBackgroundResource(R.drawable.rect_not)
+                    }
+                    else {listNow.set(id,"p")
+                        selectLayout?.setBackgroundResource(R.drawable.rect2)
                     }
                 }
             }
@@ -254,6 +297,6 @@ public class AttendanceFragment : Fragment() {
     }
     override fun onStart() {
         super.onStart()
-        updateUI()
+        if (!rStart) {updateUI()}
     }
 }

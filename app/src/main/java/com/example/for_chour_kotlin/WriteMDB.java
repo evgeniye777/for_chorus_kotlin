@@ -19,6 +19,7 @@ public class WriteMDB {
     private DataBases basa;
     static private SQLiteDatabase mdb;
     private List<String> listSpinner;
+    private String request="";
     private boolean iStoday = false;
     FragmentActivity activity;
    public WriteMDB(FragmentActivity content) {
@@ -95,6 +96,7 @@ public class WriteMDB {
     }
 
     private ContentValues getContentValuesST(String date,int purpose,List<infoOnePerson> list) {
+        request=date+",";
         ContentValues values = new ContentValues();
         values.put("version", "-1");
         values.put("date", date);

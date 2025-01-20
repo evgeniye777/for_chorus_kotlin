@@ -41,7 +41,6 @@ public class AttendanceFragment : Fragment() {
     lateinit var personsList: List<infoOnePerson>
     lateinit var listInfoRec: List<infoOneRec>
     var cursorRec: Int = -1
-    var Inplace: Int=0
     var rStart: Boolean = true;
 
     var today: String = "14.01.2025"
@@ -159,10 +158,28 @@ public class AttendanceFragment : Fragment() {
             mAdapter!!.notifyDataSetChanged()
             mPersonsRec.setAdapter(mAdapter)
         }
-        Inplace++;
-        textInPlace.setText(""+Inplace);
         if (cursorRec>=0) {butWrite.text = "Перезаписать";butWrite.setBackgroundColor(resources.getColor(R.color.pereza))}
         else {butWrite.text = "Записать"; butWrite.setBackgroundColor(resources.getColor(R.color.purple_500))}
+
+    }
+
+    private fun counting():Int {
+        var n: Int=0;
+        if (cursorRec==-1) {
+            for (infoP:infoOnePerson in personsList) {
+                if (infoP.getState()==1) {
+                    n++
+                }
+            }
+        }
+        else {
+            for (infoR:String in listInfoRec.get(cursorRec).getRecList()) {
+                if (infoR.equals("p")) {
+                    n++
+                }
+            }
+        }
+        return n
     }
 
     fun vivodMes(s: String) {
@@ -205,8 +222,6 @@ public class AttendanceFragment : Fragment() {
                 else {selectLayout?.setBackgroundResource(R.drawable.rect_gone)}
             }
             else {selectLayout?.setBackgroundResource(R.drawable.rect2)
-                Inplace++;
-                textInPlace.setText(""+Inplace);
             }
             } else {
                 var infoCs: List<String> = listInfoRec.get(cursorRec).getRecList()
@@ -214,8 +229,6 @@ public class AttendanceFragment : Fragment() {
                 id--
                 if (infoCs.get(id).equals("p")) {
                     selectLayout?.setBackgroundResource(R.drawable.rect2)
-                    Inplace++;
-                    textInPlace.setText(""+Inplace);
                 }else if (infoCs.get(id).equals("n")) {
                     selectLayout?.setBackgroundResource(R.drawable.rect_not)
                 }
@@ -251,6 +264,7 @@ public class AttendanceFragment : Fragment() {
                     }
                 }
             }
+            textInPlace.setText(""+counting());
         }
     }
 

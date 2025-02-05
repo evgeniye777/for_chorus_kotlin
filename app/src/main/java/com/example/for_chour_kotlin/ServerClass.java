@@ -1,6 +1,8 @@
 package com.example.for_chour_kotlin;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
@@ -18,29 +20,30 @@ import java.util.List;
 import java.util.Map;
 
 public class ServerClass {
+    String name="",request="";
     public  String postRequest(FragmentActivity content, Context context) {
         final String[] answer = {""};
         RequestQueue requestQueue = Volley.newRequestQueue(content);
-        String url = "https://chelny-dieta.ru/phone.php";
+        String url = "https://chelny-dieta.ru/server.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //String p = response.substring(5);
                 answer[0] = response;
-vivod(response,context);
+                vivodMes(response,context);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 answer[0] = ""+error;
-                vivod(error.toString(),context);
+                vivodMes(error.toString(),context);
                 }
         }){
             @Override
             protected Map<String,String> getParams(){
                 //"INSERT INTO account (login,password,email,name,birthday) VALUES ('$login','$password','$email','$name','$birthday')"
                 Map<String, String>  params = new HashMap<String, String>();
-                params.put("WelcomeNewYear", "2025");
+                params.put(name, request);
                 return params;}
             @Override
             public Map<String,String> getHeaders() throws AuthFailureError {
@@ -50,13 +53,25 @@ vivod(response,context);
         requestQueue.add(stringRequest);
         return answer[0];
     }
-    private String generateRequestINSERT(String date, List<String> list) {
-        String request="INSERT INTO app_st_persons_chorus63 (date,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22,c23,c24,c25,c26,c27,c28,c29,c30,c31,c32,c33,c34,c35,c36,c37,c38,c39,c40,c41,c42,c43,c44,c45,c46,c47,c48,c49,c50) VALUES (";
-        return request;
+    public void getRequestINSERT(String name0, String request0) {
+        name = name0;
+        request=request0;
     }
     public void vivod(String str,Context context) {
         Toast.makeText(context,"Вы выбрали "
                         + str,
                 Toast.LENGTH_SHORT).show();
+    }
+
+    public void vivodMes(String text,Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("info").setMessage(text).setPositiveButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dismiss the dialog
+                    }
+                });;
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

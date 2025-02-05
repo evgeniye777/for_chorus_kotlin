@@ -1,6 +1,8 @@
 package com.example.for_chour_kotlin;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,8 +24,10 @@ public class WriteMDB {
     private String request="";
     private boolean iStoday = false;
     FragmentActivity activity;
-   public WriteMDB(FragmentActivity content) {
+    Context context;
+   public WriteMDB(FragmentActivity content, Context context0) {
        activity = content;
+       context = context0;
         basa = new DataBases(content);//в первой БД хранятся данные которые я буду впоследствии обновлять, меняя версию БД
         try {basa.updateDataBase();
         } catch (IOException mIOException) {
@@ -95,6 +99,23 @@ public class WriteMDB {
         vivod(""+mdb.update("st",values,"date=?",new String[] {date}));
     }
 
+    public void muDelo()
+    {
+        Cursor cursor;
+        cursor = mdb.rawQuery("SELECT date FROM " + "st", null);
+        cursor.moveToFirst();
+        String str="";
+        while (!cursor.isAfterLast()) {
+            String date = cursor.getString(0);
+            str+=date;
+            ContentValues values = new ContentValues();
+            values.put("date", date.replace(".",""));
+            mdb.update("st",values,"date=?",new String[] {date});
+            cursor.moveToNext();
+        }
+        vivod(str);
+    }
+
     private ContentValues getContentValuesST(String date,int purpose,List<infoOnePerson> list) {
         request=date+",";
         ContentValues values = new ContentValues();
@@ -128,8 +149,34 @@ public class WriteMDB {
         vivod(""+values.size());
         return values;
     }
+    public String toSet() {
+       String request="";
+        Cursor cursor;
+        cursor = mdb.rawQuery("SELECT * FROM " + "st", null);
+        cursor.moveToLast();
+        String[] nameCell = cursor.getColumnNames();
+        request+=String.join(",",nameCell)+";";
+        int count = nameCell.length;
+        while (!cursor.isBeforeFirst()) {
+            for (int i=0;i<count;i++) {
+                request+=cursor.getString(i)+",";
+            }
+            request = request.substring(0,request.length()-1)+";";
+            cursor.moveToPrevious();
+        }
+        ServerClass serverClass = new ServerClass();
+        serverClass.getRequestINSERT("WriteAll",request);
+        return serverClass.postRequest(activity,context);
+    }
 
     public void vivod(String s) {
         Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
+    }
+
+    public void vivodMes(String text) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("info").setMessage(text);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

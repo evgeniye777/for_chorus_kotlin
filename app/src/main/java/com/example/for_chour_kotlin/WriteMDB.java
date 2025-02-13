@@ -37,6 +37,7 @@ public class WriteMDB {
             throw mSQLException;}
     }
     public List<infoOneRec> readOneRecMas(String toDay) {
+        iStoday = false;
         List<infoOneRec> listinfoRec = new ArrayList<>();
         listSpinner = new ArrayList<>();
         Cursor cursor;
@@ -44,14 +45,13 @@ public class WriteMDB {
         cursor.moveToLast();
         while (!cursor.isBeforeFirst()) {
             infoOneRec infoRec;
-            int id = Integer.parseInt(cursor.getString(0));
             int version = Integer.parseInt(cursor.getString(1));
             String date = cursor.getString(2);
             if (date.equals(toDay)) {listSpinner.add("Сегодня"); iStoday = true;}
             else {listSpinner.add(date);}
             int purpose = Integer.parseInt(cursor.getString(3));
             String c1 = cursor.getString(6);
-            infoRec = new infoOneRec(id,version,date,purpose);
+            infoRec = new infoOneRec(version,date,purpose);
             List<String> listRec = new ArrayList<>();
             int n=6;
             while (n<56) {
@@ -105,14 +105,16 @@ public class WriteMDB {
         cursor = mdb.rawQuery("SELECT date FROM " + "st", null);
         cursor.moveToFirst();
         String str="";
-        while (!cursor.isAfterLast()) {
-            String date = cursor.getString(0);
-            str+=date;
+        /*while (!cursor.isAfterLast()) {
+            str = cursor.getString(0);
+            String strNew = str.substring(4)+"."+str.substring(2,4)+"."+str.substring(0,2);
             ContentValues values = new ContentValues();
-            values.put("date", date.replace(".",""));
-            mdb.update("st",values,"date=?",new String[] {date});
+            values.put("date", strNew);
+            mdb.update("st",values,"date=?",new String[] {str});
             cursor.moveToNext();
-        }
+        }*/
+        mdb.delete("st","version=?",new String[] {"0"});
+        cursor.close();
         vivod(str);
     }
 
@@ -150,23 +152,38 @@ public class WriteMDB {
         return values;
     }
     public String toSet() {
-       String request="";
+       StringBuilder request= new StringBuilder();
         Cursor cursor;
         cursor = mdb.rawQuery("SELECT * FROM " + "st", null);
-        cursor.moveToLast();
-        String[] nameCell = cursor.getColumnNames();
-        request+=String.join(",",nameCell)+";";
-        int count = nameCell.length;
-        while (!cursor.isBeforeFirst()) {
-            for (int i=0;i<count;i++) {
-                request+=cursor.getString(i)+",";
+        cursor.moveToFirst();
+        int count = cursor.getColumnCount();
+        while (!cursor.isAfterLast()) {
+            for (int i=1;i<count;i++) {
+                String data = cursor.getString(i);
+                if (data!=null&&!data.isEmpty()) {
+                    request.append(cursor.getColumnName(i)).append(":").append(cursor.getString(i)).append(",");
+                }
             }
-            request = request.substring(0,request.length()-1)+";";
-            cursor.moveToPrevious();
+            if (request.length()>0) {
+                request.deleteCharAt(request.length()-1);
+                request.append(";");
+            }
+            cursor.moveToNext();
         }
+        cursor.close();
         ServerClass serverClass = new ServerClass();
-        serverClass.getRequestINSERT("WriteAll",request);
+        serverClass.getRequestINSERT("WriteAll", request.toString());
         return serverClass.postRequest(activity,context);
+    }
+
+
+    public String Update() {
+       return "";
+    }
+
+    public void Del(String date) {
+        mdb.delete("st","date=?",new String[] {date});
+        vivod("Запись удалена");
     }
 
     public void vivod(String s) {

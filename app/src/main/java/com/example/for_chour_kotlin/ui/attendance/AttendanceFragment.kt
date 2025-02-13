@@ -35,7 +35,7 @@ public class AttendanceFragment : Fragment() {
     private var _binding: FragmentAttendanceBinding? = null
     var serverClass = ServerClass()
     lateinit var writeMDB: WriteMDB
-    lateinit var masSpinner: List<String>
+    lateinit var masSpinner: MutableList<String>
     lateinit var masPurpose: List<String>
     lateinit var adapterSpinner: ArrayAdapter<String>
     lateinit var adapterPurpose: ArrayAdapter<String>
@@ -44,7 +44,7 @@ public class AttendanceFragment : Fragment() {
     var cursorRec: Int = -1
     var rStart: Boolean = true;
 
-    var today: String = "04022025"
+    var today: String = "2025.02.11"
 
 
     var mAdapter: PersonsAdapter? = null
@@ -60,7 +60,7 @@ public class AttendanceFragment : Fragment() {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
         var date: Date = Date()
-        var sdf:SimpleDateFormat = SimpleDateFormat("ddMMYYYY")
+        var sdf:SimpleDateFormat = SimpleDateFormat("YYYY.MM.dd")
         val dateString: String = sdf.format(date)
         today = dateString
         writeMDB = WriteMDB(activity,context)
@@ -108,10 +108,12 @@ public class AttendanceFragment : Fragment() {
             }
 
 
-            listInfoRec = writeMDB.readOneRecMas(today)
-            masSpinner = writeMDB.spinnerDay
-            cursorRec = 0
-            if (!rStart) {updateUI()}
+
+            if (!rStart) {
+                listInfoRec = writeMDB.readOneRecMas(today)
+                masSpinner = writeMDB.spinnerDay
+                cursorRec = 0
+                updateUI()}
         }
 
         spinnerDate = binding.spinnerDate
@@ -119,22 +121,7 @@ public class AttendanceFragment : Fragment() {
         spinnerDate.adapter = adapterSpinner
         spinnerDate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
-                if (date.equals("Сегодня")) {date=today;}
-                cursorRec = -1
-                for (i in 0..listInfoRec.size-1) {
-                    if (date.equals(listInfoRec.get(i).getRecDate())) {
-                        cursorRec = i;
-                        break
-                    }
-                }
-                if (cursorRec >=0) {spinnerPurpose.isEnabled = false;
-                    spinnerPurpose.setSelection(listInfoRec.get(cursorRec).purpose)
-                }
-                else {spinnerPurpose.isEnabled = true;
-                    spinnerPurpose.setSelection(0)
-                }
-                if (!rStart) {updateUI();}
+                ViborDate()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // Обработка случая, когда ничего не выбрано
@@ -183,6 +170,25 @@ public class AttendanceFragment : Fragment() {
             }
         }
         return n
+    }
+
+    public fun ViborDate() {
+        var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
+        if (date.equals("Сегодня")) {date=today;}
+        cursorRec = -1
+        for (i in 0..listInfoRec.size-1) {
+            if (date.equals(listInfoRec.get(i).getRecDate())) {
+                cursorRec = i;
+                break
+            }
+        }
+        if (cursorRec >=0) {spinnerPurpose.isEnabled = false;
+            spinnerPurpose.setSelection(listInfoRec.get(cursorRec).purpose)
+        }
+        else {spinnerPurpose.isEnabled = true;
+            spinnerPurpose.setSelection(0)
+        }
+        if (!rStart) {updateUI();}
     }
 
     fun vivodMes(s: String) {
@@ -324,6 +330,50 @@ public class AttendanceFragment : Fragment() {
             }
             R.id.MyDelo -> {
                 writeMDB.muDelo();
+                return true;
+            }
+            R.id.Update -> {
+                writeMDB.Update();
+                return true;
+            }
+            R.id.Del-> {
+                if (cursorRec>=0) {
+                    var sel: Int = spinnerDate.selectedItemPosition
+                    var day: String = masSpinner[sel]
+                    val dialogBuilder = AlertDialog.Builder(activity)
+                    dialogBuilder.setTitle("Удаление записи")
+                        .setMessage("Будет удалена запись за " + day + " число, вы уверены?")
+                        .setCancelable(false)
+                        .setPositiveButton(
+                            "Удалить",
+                            DialogInterface.OnClickListener { dialog, id ->
+                                if (day.equals("Сегодня")) {
+                                    day = today
+                                }
+                                writeMDB.Del(day);
+                                listInfoRec = writeMDB.readOneRecMas(today)
+                                masSpinner = writeMDB.spinnerDay
+                                personsList = writeMDB.readPersonMas()
+                                adapterSpinner = ArrayAdapter<String>(
+                                    requireActivity(),
+                                    android.R.layout.simple_list_item_1,
+                                    masSpinner
+                                )
+                                spinnerDate.adapter = adapterSpinner
+                                if (sel == masSpinner.size) {
+                                    sel--;
+                                }
+                                spinnerDate.setSelection(sel)
+                                //ViborDate()
+                                updateUI()
+                            })
+                        .setNegativeButton(
+                            "Отмена",
+                            DialogInterface.OnClickListener { dialog, id -> })
+                    val alert = dialogBuilder.create()
+                    alert.setTitle("AlertDialogExample")
+                    alert.show()
+                }else {vivodMes("На Сегодня запись отсутствует")}
                 return true;
             }
 

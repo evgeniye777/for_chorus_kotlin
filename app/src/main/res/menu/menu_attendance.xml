@@ -9,4 +9,12 @@
         android:id="@+id/MyDelo"
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/mydelo" />
+    <item
+        android:id="@+id/Update"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/update" />
+    <item
+        android:id="@+id/Del"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/Del" />
 </menu>

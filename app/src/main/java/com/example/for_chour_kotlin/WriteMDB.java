@@ -47,16 +47,25 @@ public class WriteMDB {
             infoOneRec infoRec;
             int version = Integer.parseInt(cursor.getString(1));
             String date = cursor.getString(2);
-            if (date.equals(toDay)) {listSpinner.add("Сегодня"); iStoday = true;}
-            else {listSpinner.add(date);}
-            int purpose = Integer.parseInt(cursor.getString(3));
+            if (date.equals(toDay)) {
+                listSpinner.add("Сегодня");
+                iStoday = true;
+            } else {
+                listSpinner.add(date);
+            }
+            int purpose = 0;
+            try {
+                purpose = Integer.parseInt(cursor.getString(3));
+            } catch (Exception e) {}
             String c1 = cursor.getString(6);
-            infoRec = new infoOneRec(version,date,purpose);
+            infoRec = new infoOneRec(version, date, purpose);
             List<String> listRec = new ArrayList<>();
-            int n=6;
-            while (n<56) {
+            int n = 6;
+            while (n < 56) {
                 String cur = cursor.getString(n);
-                if (cur==null) {cur="";}
+                if (cur == null) {
+                    cur = "";
+                }
                 listRec.add(cur);
                 n++;
             }
@@ -101,21 +110,8 @@ public class WriteMDB {
 
     public void muDelo()
     {
-        Cursor cursor;
-        cursor = mdb.rawQuery("SELECT date FROM " + "st", null);
-        cursor.moveToFirst();
-        String str="";
-        /*while (!cursor.isAfterLast()) {
-            str = cursor.getString(0);
-            String strNew = str.substring(4)+"."+str.substring(2,4)+"."+str.substring(0,2);
-            ContentValues values = new ContentValues();
-            values.put("date", strNew);
-            mdb.update("st",values,"date=?",new String[] {str});
-            cursor.moveToNext();
-        }*/
-        mdb.delete("st","version=?",new String[] {"0"});
-        cursor.close();
-        vivod(str);
+        mdb.execSQL("DELETE FROM " + "st");
+        mdb.close();
     }
 
     private ContentValues getContentValuesST(String date,int purpose,List<infoOnePerson> list) {
@@ -173,11 +169,41 @@ public class WriteMDB {
         cursor.close();
         ServerClass serverClass = new ServerClass();
         serverClass.getRequestINSERT("WriteAll", request.toString());
-        return serverClass.postRequest(activity,context);
+        return serverClass.postRequest(activity,context,null);
     }
 
 
     public String Update() {
+        ServerClass serverClass = new ServerClass();
+        serverClass.getRequestINSERT("UpdateAll", request.toString());
+        String answer = serverClass.postRequest(activity, context, new VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+                vivodMes(result.replace(";",";\n\n\n"));
+                String[] mas = result.substring(1,result.length()-1).split(";");
+                ContentValues values;
+                String message="error: "; int i=0;
+                for (String str: mas) {
+                    values = new ContentValues();
+                    String[] masCell = str.split(",");
+                    for (String cell:masCell) {
+                        String[] masDate = cell.split(":");
+                        try {
+                            values.put(masDate[0],masDate[1]);
+                        }catch (Exception e) {message+=""+i+". "+masDate+"; ";}
+                    }
+                    message+="\nРезультат: "+mdb.insert("st",null,values)+"\n";
+                    i++;
+                }
+                vivodMes(message);
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+
        return "";
     }
 
@@ -195,5 +221,9 @@ public class WriteMDB {
         builder.setTitle("info").setMessage(text);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+    public interface VolleyCallback {
+        void onSuccess(String result);
+        void onError(String error);
     }
 }

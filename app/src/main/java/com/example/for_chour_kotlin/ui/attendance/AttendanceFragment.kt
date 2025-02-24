@@ -44,7 +44,7 @@ public class AttendanceFragment : Fragment() {
     var cursorRec: Int = -1
     var rStart: Boolean = true;
 
-    var today: String = "2025.02.11"
+    var today: String = "2025.02.18"
 
 
     var mAdapter: PersonsAdapter? = null
@@ -333,7 +333,7 @@ public class AttendanceFragment : Fragment() {
                 return true;
             }
             R.id.Update -> {
-                writeMDB.Update();
+                vivodMes(writeMDB.Update());
                 return true;
             }
             R.id.Del-> {

@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class ServerClass {
     String name="",request="";
-    public  String postRequest(FragmentActivity content, Context context) {
+    public  String postRequest(FragmentActivity content, Context context,final WriteMDB.VolleyCallback callback) {
         final String[] answer = {""};
         RequestQueue requestQueue = Volley.newRequestQueue(content);
         String url = "https://chelny-dieta.ru/server.php";
@@ -29,19 +29,20 @@ public class ServerClass {
             @Override
             public void onResponse(String response) {
                 //String p = response.substring(5);
-                answer[0] = response;
-                vivodMes(response,context);
+                if (callback!=null) {callback.onSuccess(response);}
+                else {answer[0] = response;
+                vivodMes(response,context);}
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                answer[0] = ""+error;
-                vivodMes(error.toString(),context);
+                if (callback!=null) {callback.onError(error.toString());}
+                else {answer[0] = ""+error;
+                vivodMes(error.toString(),context);}
                 }
         }){
             @Override
             protected Map<String,String> getParams(){
-                //"INSERT INTO account (login,password,email,name,birthday) VALUES ('$login','$password','$email','$name','$birthday')"
                 Map<String, String>  params = new HashMap<String, String>();
                 params.put(name, request);
                 return params;}

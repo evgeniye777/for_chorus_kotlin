@@ -183,7 +183,7 @@ public class WriteMDB {
                 int pEnd = result.lastIndexOf("\"");
                 result = result.substring(1,pEnd);
                 vivodMes(result.replace(";",";\n\n\n"));
-                String[] mas = result.substring(1,result.length()-1).split(";");
+                String[] mas = result.split(";");
                 ContentValues values;
                 String message="error: "; int i=0;
                 for (String str: mas) {

@@ -14,7 +14,7 @@ import java.io.OutputStream;
 public class DataBases extends SQLiteOpenHelper {
     private static String DB_NAME="person.db";
     private static String DB_PATH = "";
-    private static int DB_VERSION = 8;
+    private static int DB_VERSION = 11;
     private SQLiteDatabase mDataBase;
     private final Context mContext;
     private boolean mNeedUpdate = false;

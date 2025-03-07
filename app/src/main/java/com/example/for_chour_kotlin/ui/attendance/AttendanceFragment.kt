@@ -13,6 +13,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
@@ -27,6 +29,9 @@ import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.ServerClass
 import com.example.for_chour_kotlin.WriteMDB
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.Date
 
 
@@ -54,6 +59,8 @@ public class AttendanceFragment : Fragment() {
     lateinit var spinnerDate: Spinner
     lateinit var spinnerPurpose: Spinner
     lateinit var textInPlace: TextView
+    lateinit var editDate: EditText
+    lateinit var checkBoxActive: CheckBox
 
     private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,7 +134,45 @@ public class AttendanceFragment : Fragment() {
                 // Обработка случая, когда ничего не выбрано
             }
         }
+
+        editDate = binding.editDate
+        checkBoxActive = binding.checkActive
+        checkBoxActive.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                changeMasSpiner()
+                checkBoxActive.isChecked = false
+            } else {
+            }
+        }
         return root
+    }
+
+    private fun changeMasSpiner() {
+        val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+        try {
+            val date = LocalDate.parse(editDate.text, formatter)
+            var formattedDate = date.format(formatter)
+
+            val today = LocalDate.now()
+            println("Сегодняшняя дата: $today")
+            // Сравниваем даты
+            when {date.isEqual(today) -> { formattedDate = "Сегодня" } }
+            var r: Boolean = false
+            for (i in 0..masSpinner.size-1) {
+                if (masSpinner[i].equals(formattedDate)) {
+                    spinnerDate.setSelection(i);
+                    r=true
+                    break
+                }
+            }
+            if (!r) {
+                masSpinner.add(0,formattedDate);
+                adapterSpinner = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masSpinner)
+                spinnerDate.adapter = adapterSpinner
+            }
+        } catch (e: DateTimeParseException) {
+            vivod("Укажите правильный формат даты (пример 2025.01.01 -> год.месяц.день)")
+        }
     }
 
     override fun onDestroyView() {

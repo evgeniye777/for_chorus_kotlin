@@ -168,6 +168,7 @@ public class WriteMDB {
         }
         cursor.close();
         ServerClass serverClass = new ServerClass();
+        vivodMes(request.toString());
         serverClass.getRequestINSERT("WriteAll", request.toString());
         return serverClass.postRequest(activity,context,null);
     }
@@ -179,6 +180,8 @@ public class WriteMDB {
         String answer = serverClass.postRequest(activity, context, new VolleyCallback() {
             @Override
             public void onSuccess(String result) {
+                int pEnd = result.lastIndexOf("\"");
+                result = result.substring(1,pEnd);
                 vivodMes(result.replace(";",";\n\n\n"));
                 String[] mas = result.substring(1,result.length()-1).split(";");
                 ContentValues values;

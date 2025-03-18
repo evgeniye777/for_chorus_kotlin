@@ -14,8 +14,15 @@ import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson;
 import com.example.for_chour_kotlin.PersonsInfo.infoOneRec;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class WriteMDB {
     private DataBases basa;
@@ -45,8 +52,8 @@ public class WriteMDB {
         cursor.moveToLast();
         while (!cursor.isBeforeFirst()) {
             infoOneRec infoRec;
-            int version = Integer.parseInt(cursor.getString(1));
-            String date = cursor.getString(2);
+            String date_write = cursor.getString(3);
+            String date = cursor.getString(4);
             if (date.equals(toDay)) {
                 listSpinner.add("Сегодня");
                 iStoday = true;
@@ -55,13 +62,12 @@ public class WriteMDB {
             }
             int purpose = 0;
             try {
-                purpose = Integer.parseInt(cursor.getString(3));
+                purpose = Integer.parseInt(cursor.getString(5));
             } catch (Exception e) {}
-            String c1 = cursor.getString(6);
-            infoRec = new infoOneRec(version, date, purpose);
+            infoRec = new infoOneRec(date_write, date, purpose);
             List<String> listRec = new ArrayList<>();
-            int n = 6;
-            while (n < 56) {
+            int n = 8;
+            while (n < 83) {
                 String cur = cursor.getString(n);
                 if (cur == null) {
                     cur = "";
@@ -117,7 +123,17 @@ public class WriteMDB {
     private ContentValues getContentValuesST(String date,int purpose,List<infoOnePerson> list) {
         request=date+",";
         ContentValues values = new ContentValues();
-        values.put("version", "-1");
+
+        //надо изменить
+        values.put("committer", "Гузенко Евгений");
+        values.put("shipped", 1);
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
+
+        values.put("date_write", formattedDateTime);
+
         values.put("date", date);
         values.put("purpose", purpose);
         for (infoOnePerson s: list) {
@@ -136,7 +152,16 @@ public class WriteMDB {
 
     private ContentValues getContentValuesSTover(String date,int purpose,List<String> list) {
         ContentValues values = new ContentValues();
-        values.put("version", "-1");
+
+        values.put("committer", "Гузенко Евгений");
+        values.put("shipped", 1);
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
+
+        values.put("date_write", formattedDateTime);
+
         values.put("date", date);
         values.put("purpose", purpose);
         int n=1;
@@ -157,12 +182,14 @@ public class WriteMDB {
             for (int i=1;i<count;i++) {
                 String data = cursor.getString(i);
                 if (data!=null&&!data.isEmpty()) {
-                    request.append(cursor.getColumnName(i)).append(":").append(cursor.getString(i)).append(",");
+                    if (!cursor.getColumnName(i).equals("shipped")) {
+                    request.append(cursor.getColumnName(i)).append("¦").append(cursor.getString(i)).append("¦¦");}
                 }
             }
             if (request.length()>0) {
-                request.deleteCharAt(request.length()-1);
-                request.append(";");
+                int lastIndex = request.lastIndexOf("¦¦");
+                if (lastIndex!=-1) {request.delete(lastIndex, lastIndex + 2);}
+                request.append("¦¦¦");
             }
             cursor.moveToNext();
         }
@@ -185,6 +212,7 @@ public class WriteMDB {
                 vivodMes(result.replace(";",";\n\n\n"));
                 String[] mas = result.split(";");
                 ContentValues values;
+                int n_date=1;
                 String message="error: "; int i=0;
                 for (String str: mas) {
                     values = new ContentValues();
@@ -193,6 +221,7 @@ public class WriteMDB {
                         String[] masDate = cell.split(":");
                         try {
                             values.put(masDate[0],masDate[1]);
+
                         }catch (Exception e) {message+=""+i+". "+masDate+"; ";}
                     }
                     message+="\nРезультат: "+mdb.insert("st",null,values)+"\n";

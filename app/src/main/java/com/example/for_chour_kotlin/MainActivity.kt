@@ -70,3 +70,13 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
     }
 }
+
+/*
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=file\:///D:/MyFiles/Trainings/0_Gradle/gradle-8.12.1-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+*/
+//https\://services.gradle.org/distributions/gradle-8.12.1-bin.zip
+//file\:///D:/MyFiles/Trainings/0_Gradle/gradle-8.12.1-bin.zip

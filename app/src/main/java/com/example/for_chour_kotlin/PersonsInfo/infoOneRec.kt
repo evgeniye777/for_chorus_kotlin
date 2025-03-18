@@ -1,16 +1,16 @@
 package com.example.for_chour_kotlin.PersonsInfo
 
 class infoOneRec {
-    var version: Int = -1
+    var date_write: String = ""
     lateinit var date: String
     var purpose: Int = -1
     lateinit var data: String
     lateinit var comments: String
     lateinit var list: MutableList<String>
 
-    constructor( version0: Int,date0: String,purpose0:Int)
+    constructor(date_write0: String, date0: String, purpose0:Int)
     {
-         version = version0; date = date0; purpose = purpose0;
+         date_write = date_write0; date = date0; purpose = purpose0;
     }
     fun addToList(c: MutableList<String>) {
         list = c

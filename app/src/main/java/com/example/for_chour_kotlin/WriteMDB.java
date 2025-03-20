@@ -1,11 +1,14 @@
 package com.example.for_chour_kotlin;
 
+import static java.lang.System.in;
+
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
@@ -44,40 +47,50 @@ public class WriteMDB {
             throw mSQLException;}
     }
     public List<infoOneRec> readOneRecMas(String toDay) {
-        iStoday = false;
         List<infoOneRec> listinfoRec = new ArrayList<>();
         listSpinner = new ArrayList<>();
-        Cursor cursor;
-        cursor = mdb.rawQuery("SELECT * FROM " + "st", null);
-        cursor.moveToLast();
-        while (!cursor.isBeforeFirst()) {
-            infoOneRec infoRec;
-            String date_write = cursor.getString(3);
-            String date = cursor.getString(4);
-            if (date.equals(toDay)) {
-                listSpinner.add("Сегодня");
-                iStoday = true;
-            } else {
-                listSpinner.add(date);
+        Cursor cursor = null;
+
+        try {
+            cursor = mdb.rawQuery("SELECT * FROM st", null);
+            if (cursor != null && cursor.moveToLast()) {
+                // Получаем индексы столбцов по их названиям
+                int dateWriteIndex = cursor.getColumnIndex("date_write");
+                int dateIndex = cursor.getColumnIndex("date");
+                int purposeIndex = cursor.getColumnIndex("purpose");
+
+                do {
+                    String date_write = cursor.getString(dateWriteIndex);
+                    String date = cursor.getString(dateIndex);
+                    if (date.equals(toDay)) {
+                        listSpinner.add("Сегодня");
+                    } else {
+                        listSpinner.add(date);
+                    }
+
+                    int purpose = 0;
+                    try {
+                        purpose = Integer.parseInt(cursor.getString(purposeIndex));
+                    } catch (NumberFormatException e) {
+                        Log.e("ReadOneRecMas", "Ошибка при парсинге purpose: " + e.getMessage());
+                    }
+
+                    infoOneRec infoRec = new infoOneRec(date_write, date, purpose);
+                    List<String> listRec = new ArrayList<>();
+
+                    for (int n = 8; n < 83; n++) {
+                        String cur = cursor.getString(n);
+                        listRec.add(cur != null ? cur : "");
+                    }
+
+                    infoRec.addToList(listRec);
+                    listinfoRec.add(infoRec);
+                } while (cursor.moveToPrevious());
             }
-            int purpose = 0;
-            try {
-                purpose = Integer.parseInt(cursor.getString(5));
-            } catch (Exception e) {}
-            infoRec = new infoOneRec(date_write, date, purpose);
-            List<String> listRec = new ArrayList<>();
-            int n = 8;
-            while (n < 83) {
-                String cur = cursor.getString(n);
-                if (cur == null) {
-                    cur = "";
-                }
-                listRec.add(cur);
-                n++;
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Закрываем курсор
             }
-            infoRec.addToList(listRec);
-            listinfoRec.add(infoRec);
-            cursor.moveToPrevious();
         }
         return listinfoRec;
     }
@@ -96,7 +109,8 @@ public class WriteMDB {
             infoOnePerson infoPerson = new infoOnePerson(id,cursor.getString(5),0);
             infoPerson.setGender(Integer.parseInt(cursor.getString(6)));
             infoPerson.setAllowed(Integer.parseInt(cursor.getString(7)));
-            if (infoPerson.getAllowed()==0||infoPerson.getAllowed()==1)  mas.add(infoPerson);
+            infoPerson.setVisible(Integer.parseInt(cursor.getString(9)));
+            if (infoPerson.getVisible()==1)  mas.add(infoPerson);
             cursor.moveToNext();
         }
         return mas;
@@ -139,7 +153,7 @@ public class WriteMDB {
         for (infoOnePerson s: list) {
             if (s.getState()==1) {values.put("c"+s.getId(), "p");}
             else {
-                    if (purpose == 0 || purpose == 3 && s.getAllowed() == 1 || purpose == s.getGender()) {
+                    if ((s.getAllowed() ==0|| s.getAllowed() == 1)&&(purpose == 0 || purpose == 3 && s.getAllowed() == 1 || purpose == s.getGender())) {
                         values.put("c" + s.getId(), "n");
                     } else {
                         values.put("c" + s.getId(), "d");

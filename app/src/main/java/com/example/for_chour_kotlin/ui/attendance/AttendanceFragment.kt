@@ -1,9 +1,11 @@
 package com.example.for_chour_kotlin.ui.attendance
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -202,7 +204,7 @@ public class AttendanceFragment : Fragment() {
         var purpose: Int = spinnerPurpose.selectedItemPosition
         if (cursorRec==-1) {
             for (infoP:infoOnePerson in personsList) {
-                if (infoP.getState()==1&&(purpose==0||purpose==3&&infoP?.getAllowed()==1||infoP?.getGender()==purpose)) {
+                if (infoP.state==1&&(purpose==0||purpose==3&&infoP?.allowed==1||infoP?.gender==purpose)) {
                     n++
                 }
             }
@@ -268,63 +270,64 @@ public class AttendanceFragment : Fragment() {
 
         fun bind(sperson: infoOnePerson?) {
             mPerson = sperson
-            name?.text = mPerson?.getName()
+            name?.text = mPerson?.name
             if (cursorRec==-1) {
                 var purpose: Int = spinnerPurpose.selectedItemPosition
-            if (mPerson?.getState() ==0?: true) {
-                if (purpose==0||purpose==3&&mPerson?.getAllowed()==1||mPerson?.getGender()==purpose) { selectLayout?.setBackgroundResource(R.drawable.rect1)}
+            if (mPerson?.state ==0?: true) {
+                if (mPerson?.allowed in 0..1&&(purpose==0||purpose==3&&mPerson?.allowed==1||mPerson?.gender==purpose)) { selectLayout?.setBackgroundResource(R.drawable.rect1)}
                 else {selectLayout?.setBackgroundResource(R.drawable.rect_gone)}
             }
             else {
-                if (purpose==0||purpose==3&&mPerson?.getAllowed()==1||mPerson?.getGender()==purpose) {
-                selectLayout?.setBackgroundResource(R.drawable.rect2)}
-                else {
-                    mPerson?.setState(0);
-                    selectLayout?.setBackgroundResource(R.drawable.rect_gone)
-                }
+                selectLayout?.setBackgroundResource(R.drawable.rect2)
             }
             } else {
                 var infoCs: List<String> = listInfoRec.get(cursorRec).getRecList()
-                var id: Int = mPerson?.getId() ?: 1
+                var id: Int = mPerson?.id ?: 1
                 id--
                 if (infoCs.get(id).equals("p")) {
                     selectLayout?.setBackgroundResource(R.drawable.rect2)
                 }else if (infoCs.get(id).equals("n")) {
                     selectLayout?.setBackgroundResource(R.drawable.rect_not)
                 }
-                else if (infoCs.get(id).equals("d")|| infoCs.get(id).equals("")) {
+                else  {
                     selectLayout?.setBackgroundResource(R.drawable.rect_gone)
                 }
             }
         }
 
+        @SuppressLint("SuspiciousIndentation", "SetTextI18n")
         override fun onClick(view: View) {
-            if (cursorRec==-1) {
-                var purpose: Int = spinnerPurpose.selectedItemPosition
-                if (purpose==0||purpose==3&&mPerson?.getAllowed()==1||mPerson?.getGender()==purpose) {
-                    if (mPerson?.getState() == 0 ?: true) {
-                        mPerson?.setState(1); selectLayout?.setBackgroundResource(R.drawable.rect2)
-                    } else {
-                        mPerson?.setState(0);selectLayout?.setBackgroundResource(R.drawable.rect1)
-                    }
+            if (cursorRec == -1) {
+                val purpose: Int = spinnerPurpose.selectedItemPosition
+                if (mPerson?.state == 0) {
+                    mPerson?.state = 1
+                    selectLayout?.setBackgroundResource(R.drawable.rect2)
+                } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 || (purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
+                    selectLayout?.setBackgroundResource(R.drawable.rect_gone)
+                    mPerson?.state = 0
+                } else {
+                    mPerson?.state = 0
+                    selectLayout?.setBackgroundResource(R.drawable.rect1)
                 }
-            }
-            else {
-                var purpose: Int = spinnerPurpose.selectedItemPosition
-                var listNow: MutableList<String>  = listInfoRec.get(cursorRec).getRecList()
-                var id: Int = mPerson?.getId() ?:1;
-                id--
-                if (purpose==0||purpose==3&&mPerson?.getAllowed()==1||mPerson?.getGender()==purpose) {
-                    if (listNow.get(id).equals("p")) {
-                       listNow.set(id,"n")
+            } else {
+                val purpose: Int = spinnerPurpose.selectedItemPosition
+                val listNow: MutableList<String> = listInfoRec[cursorRec].getRecList()
+                var id: Int = (mPerson?.id ?: 1) - 1
+
+                try {
+                    if (listNow[id].isNotEmpty() && listNow[id] != "p") {
+                        listNow[id] = "p"
+                        selectLayout?.setBackgroundResource(R.drawable.rect2)
+                    } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 || (purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
+                        selectLayout?.setBackgroundResource(R.drawable.rect_gone)
+                        listNow[id] = "d"
+                    } else {
+                        listNow[id] = "n"
                         selectLayout?.setBackgroundResource(R.drawable.rect_not)
                     }
-                    else {listNow.set(id,"p")
-                        selectLayout?.setBackgroundResource(R.drawable.rect2)
-                    }
-                }
+                } catch (_: Exception) {}
             }
-            textInPlace.setText(""+counting());
+            textInPlace.text = counting().toString()
         }
     }
 

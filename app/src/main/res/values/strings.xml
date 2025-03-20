@@ -7,4 +7,10 @@
     <string name="mydelo">Delo</string>
     <string name="update">Загрузить</string>
     <string name="Del">Удалить запись</string>
+
+    <string name="title_sours">Поиск</string>
+    <string name="title_like">Избранное</string>
+    <string name="title_responses">Отклики</string>
+    <string name="title_message">Сообщения</string>
+    <string name="title_profile">Профиль</string>
 </resources>

@@ -29,6 +29,7 @@ import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson
 import com.example.for_chour_kotlin.PersonsInfo.infoOneRec
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.ServerClass
+import com.example.for_chour_kotlin.WorkWithData.SendLastDate
 import com.example.for_chour_kotlin.WriteMDB
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
 import java.time.LocalDate
@@ -374,6 +375,11 @@ public class AttendanceFragment : Fragment() {
         when (item.itemId) {
             R.id.toSet -> {
                 writeMDB.toSet();
+                return true;
+            }
+            R.id.toSetLast -> {
+                val sendObject: SendLastDate = SendLastDate()
+                sendObject.startSend(requireActivity(),requireContext())
                 return true;
             }
             R.id.MyDelo -> {

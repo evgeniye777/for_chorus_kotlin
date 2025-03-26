@@ -4,6 +4,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="request">Отправить</string>
+    <string name="requestLast">Отправить последние</string>
     <string name="mydelo">Delo</string>
     <string name="update">Загрузить</string>
     <string name="Del">Удалить запись</string>

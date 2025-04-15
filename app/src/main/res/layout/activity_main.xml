@@ -176,10 +176,10 @@
 
     <View
         android:id="@+id/dim_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
         android:background="#B0000000"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/fragment_container_drawer"

@@ -144,7 +144,6 @@ class MainActivity : AppCompatActivity() {
                 vivod("шторка")
                 return true
             }
-
             else -> return super.onOptionsItemSelected(item)
         }
     }

@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.android.volley.Request
-import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -100,7 +99,13 @@ class SendLastDate {
                             "comments",
                             cursor.getString(cursor.getColumnIndex("comments"))
                         )
-                        // Добавьте остальные поля по аналогии
+                        for (i in 1..75) {
+                            val columnName = "c$i"
+                            val value = cursor.getString(cursor.getColumnIndex(columnName))
+                            if (value != null && value.isNotEmpty()) {
+                                jsonObject.put(columnName, value)
+                            }
+                        }
 
                         jsonArray.put(jsonObject)
                     } while (cursor.moveToNext())
@@ -110,7 +115,10 @@ class SendLastDate {
             cursor.close()
         }
 
-        if (writeR) {sendDataToServer(jsonArray)}
+        if (writeR) {
+            vivodMes(""+jsonArray)
+            //sendDataToServer(jsonArray)
+        }
         else {vivodMes("Данные уже синхронизированы")}
     }
 

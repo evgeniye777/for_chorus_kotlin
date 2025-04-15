@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +51,6 @@ public class WriteMDB {
         List<infoOneRec> listinfoRec = new ArrayList<>();
         listSpinner = new ArrayList<>();
         Cursor cursor = null;
-
         try {
             cursor = mdb.rawQuery("SELECT * FROM st", null);
             if (cursor != null && cursor.moveToLast()) {
@@ -235,7 +235,6 @@ public class WriteMDB {
                         String[] masDate = cell.split(":");
                         try {
                             values.put(masDate[0],masDate[1]);
-
                         }catch (Exception e) {message+=""+i+". "+masDate+"; ";}
                     }
                     message+="\nРезультат: "+mdb.insert("st",null,values)+"\n";

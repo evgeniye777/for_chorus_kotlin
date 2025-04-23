@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -29,7 +28,7 @@ import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson
 import com.example.for_chour_kotlin.PersonsInfo.infoOneRec
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.ServerClass
-import com.example.for_chour_kotlin.WorkWithData.SendLastDate
+import com.example.for_chour_kotlin.data_manager.requests.SendLastDate
 import com.example.for_chour_kotlin.WriteMDB
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
 import java.time.LocalDate

@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.WorkWithData
+package com.example.for_chour_kotlin.data_manager.requests
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -11,7 +11,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.example.for_chour_kotlin.DataBases
+import com.example.for_chour_kotlin.data_manager.connectionSQL.DataBases
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -26,7 +26,10 @@ class SendLastDate {
 
     fun startSend( content: FragmentActivity,context0: Context) {
         context = context0
-        basa = DataBases(content) //в первой БД хранятся данные которые я буду впоследствии обновлять, меняя версию БД
+        basa =
+            DataBases(
+                content
+            ) //в первой БД хранятся данные которые я буду впоследствии обновлять, меняя версию БД
         try {
             basa!!.updateDataBase()
         } catch (mIOException: IOException) {

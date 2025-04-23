@@ -1,7 +1,5 @@
 package com.example.for_chour_kotlin;
 
-import static java.lang.System.in;
-
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,18 +13,13 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson;
 import com.example.for_chour_kotlin.PersonsInfo.infoOneRec;
+import com.example.for_chour_kotlin.data_manager.connectionSQL.DataBases;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class WriteMDB {
     private DataBases basa;

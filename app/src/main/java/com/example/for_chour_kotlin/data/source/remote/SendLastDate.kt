@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.WorkWithData
+package com.example.for_chour_kotlin.data.source.remote
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -11,7 +11,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.example.for_chour_kotlin.DataBases
+import com.example.for_chour_kotlin.data.source.local.DataBases
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -26,7 +26,10 @@ class SendLastDate {
 
     fun startSend( content: FragmentActivity,context0: Context) {
         context = context0
-        basa = DataBases(content) //в первой БД хранятся данные которые я буду впоследствии обновлять, меняя версию БД
+        basa =
+            DataBases(
+                content
+            ) //в первой БД хранятся данные которые я буду впоследствии обновлять, меняя версию БД
         try {
             basa!!.updateDataBase()
         } catch (mIOException: IOException) {
@@ -72,7 +75,7 @@ class SendLastDate {
 
     @SuppressLint("Range")
     private fun fetchLocalData(lastId: Int) {
-        val cursor = mdb?.rawQuery("SELECT * FROM st WHERE id > ?", arrayOf(lastId.toString()))
+        val cursor = mdb?.rawQuery("SELECT * FROM app_st_persons_chorus63_sinch WHERE id > ?", arrayOf(lastId.toString()))
 
         val jsonArray = JSONArray()
         var writeR: Boolean = false
@@ -87,7 +90,7 @@ class SendLastDate {
                             "committer",
                             cursor.getString(cursor.getColumnIndex("committer"))
                         )
-                        //jsonObject.put("shipped", cursor.getInt(cursor.getColumnIndex("shipped")))
+
                         jsonObject.put(
                             "date_write",
                             cursor.getString(cursor.getColumnIndex("date_write"))

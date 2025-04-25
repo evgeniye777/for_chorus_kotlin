@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.PersonsInfo
+package com.example.for_chour_kotlin.domain
 
 class infoOneRec {
     var date_write: String = ""

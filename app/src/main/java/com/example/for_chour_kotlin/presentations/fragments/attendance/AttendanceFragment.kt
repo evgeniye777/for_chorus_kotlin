@@ -1,11 +1,10 @@
-package com.example.for_chour_kotlin.ui.attendance
+package com.example.for_chour_kotlin.presentations.fragments.attendance
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -25,12 +24,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson
-import com.example.for_chour_kotlin.PersonsInfo.infoOneRec
+import com.example.for_chour_kotlin.domain.infoOnePerson
+import com.example.for_chour_kotlin.domain.infoOneRec
 import com.example.for_chour_kotlin.R
-import com.example.for_chour_kotlin.ServerClass
-import com.example.for_chour_kotlin.WorkWithData.SendLastDate
-import com.example.for_chour_kotlin.WriteMDB
+import com.example.for_chour_kotlin.data.source.remote.ServerClass
+import com.example.for_chour_kotlin.data.source.remote.SendLastDate
+import com.example.for_chour_kotlin.domain.WriteMDB
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -41,7 +40,8 @@ import java.util.Date
 public class AttendanceFragment : Fragment() {
 
     private var _binding: FragmentAttendanceBinding? = null
-    var serverClass = ServerClass()
+    var serverClass =
+        ServerClass()
     lateinit var writeMDB: WriteMDB
     lateinit var masSpinner: MutableList<String>
     lateinit var masPurpose: List<String>
@@ -73,7 +73,8 @@ public class AttendanceFragment : Fragment() {
         var sdf:SimpleDateFormat = SimpleDateFormat("YYYY.MM.dd")
         val dateString: String = sdf.format(date)
         today = dateString
-        writeMDB = WriteMDB(activity,context)
+        writeMDB =
+            WriteMDB(activity, context)
         listInfoRec = writeMDB.readOneRecMas(today)
         masSpinner = writeMDB.spinnerDay
         personsList = writeMDB.readPersonMas()
@@ -89,7 +90,7 @@ public class AttendanceFragment : Fragment() {
         //adapter = ArrayAdapter<String>(requireActivity(), R.layout.item, R.id.tvText,masPersson)
         textInPlace = binding.textInplace
         spinnerPurpose = binding.spinnerPurpose
-        masPurpose = listOf("Общий", "Сестринский", "Братский","Служение")
+        masPurpose = listOf("Общий", "Сестринский", "Братский","Служение","Репетиция Св.","Служение Св.")
         adapterPurpose = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masPurpose)
         spinnerPurpose.adapter = adapterPurpose
         spinnerPurpose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -200,27 +201,76 @@ public class AttendanceFragment : Fragment() {
         textInPlace.setText(""+counting())
     }
 
-    private fun counting():Int {
-        var n: Int=0;
+    private fun counting():String {
+        //все
+        var n: Int = 0
+        var nMustAll: Int = 0
+        var nAbsAll: Int = 0
+
+        //братья
+        var n_b = 0
+        var nMustAll_b = 0
+        var nAbsAll_b = 0
+
+        //сестры
+        var n_s = 0
+        var nMustAll_s = 0
+        var nAbsAll_s = 0
+
         var purpose: Int = spinnerPurpose.selectedItemPosition
         if (cursorRec==-1) {
-            for (infoP:infoOnePerson in personsList) {
-                if (infoP.state==1&&(purpose==0||purpose==3&&infoP?.allowed==1||infoP?.gender==purpose)) {
-                    n++
+            for (infoP: infoOnePerson in personsList) {
+
+                if (infoP.state==1) {n++
+                    if (infoP.gender==2) {n_b++}
+                    else if (infoP.gender==1) {n_s++}
                 }
+
+                if (infoP.allowed in 0..1&&(purpose==0||purpose==3&& infoP.allowed ==1|| infoP.gender ==purpose)) {
+                    nMustAll++
+                    if (infoP.gender==2) {nMustAll_b++}
+                    else if (infoP.gender==1) {nMustAll_s++}
+                }
+
+                if (infoP.gender==2) {nAbsAll_b++}
+                else if (infoP.gender==1) {nAbsAll_s++}
+                nAbsAll++
             }
         }
         else {
+            var i=0;
             for (infoR:String in listInfoRec.get(cursorRec).getRecList()) {
+                if (i>=personsList.size) {break}
+                val infoP: infoOnePerson = personsList.get(i)
                 if (infoR.equals("p")) {
                     n++
+                    if (infoP.gender == 2) {
+                        n_b++;
+                    } else if (infoP.gender == 1) {
+                        n_s++;
+                    }
                 }
+
+                if (infoP.allowed in 0..1&&(purpose==0||purpose==3&& infoP.allowed ==1|| infoP.gender ==purpose)) {
+                    nMustAll++
+                    if (infoP.gender == 2) {
+                        nMustAll_b++
+                    } else if (infoP.gender == 1) {
+                        nMustAll_s++
+                    }
+                }
+
+
+                if (infoP.gender==2) {nAbsAll_b++}
+                else if (infoP.gender==1) {nAbsAll_s++}
+                nAbsAll++
+                i++
             }
         }
-        return n
+        return "Все: "+n+"/"+nMustAll+" ["+nAbsAll+"]  "+"Б: "+n_b+"/"+nMustAll_b+" ["+nAbsAll_b+"]  "+"С: "+n_s+"/"+nMustAll_s+" ["+nAbsAll_s+"] "
     }
 
-    public fun ViborDate() {
+    fun ViborDate() {
         var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
         if (date.equals("Сегодня")) {date=today;}
         cursorRec = -1
@@ -275,7 +325,7 @@ public class AttendanceFragment : Fragment() {
             if (cursorRec==-1) {
                 var purpose: Int = spinnerPurpose.selectedItemPosition
             if (mPerson?.state ==0?: true) {
-                if (mPerson?.allowed in 0..1&&(purpose==0||purpose==3&&mPerson?.allowed==1||mPerson?.gender==purpose)) { selectLayout?.setBackgroundResource(R.drawable.rect1)}
+                if (mPerson?.allowed in 0..1&&(purpose==0||purpose==4||purpose==5||purpose==3&&mPerson?.allowed==1||mPerson?.gender==purpose)) { selectLayout?.setBackgroundResource(R.drawable.rect1)}
                 else {selectLayout?.setBackgroundResource(R.drawable.rect_gone)}
             }
             else {
@@ -303,7 +353,7 @@ public class AttendanceFragment : Fragment() {
                 if (mPerson?.state == 0) {
                     mPerson?.state = 1
                     selectLayout?.setBackgroundResource(R.drawable.rect2)
-                } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 || (purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
+                } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 ||purpose == 4 ||purpose == 5  ||(purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
                     selectLayout?.setBackgroundResource(R.drawable.rect_gone)
                     mPerson?.state = 0
                 } else {

@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.for_chour_kotlin.ui.attendance.AttendanceFragment"
+        android:name="com.example.for_chour_kotlin.presentations.fragments.attendance.AttendanceFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_attendance" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.for_chour_kotlin.ui.statisticSongs.StatisticSongFragment"
+        android:name="com.example.for_chour_kotlin.presentations.fragments.statisticSongs.StatisticSongFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_statisticsongs" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.for_chour_kotlin.ui.intheskysongs.InTheSkySongsFragment"
+        android:name="com.example.for_chour_kotlin.presentations.fragments.intheskysongs.InTheSkySongsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_intheskysongs" />
 </navigation>

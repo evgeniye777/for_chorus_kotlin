@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin
+package com.example.for_chour_kotlin.presentations.activities
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
@@ -12,9 +12,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.databinding.ActivityMainBinding
-import com.example.for_chour_kotlin.ui.attendance.AttendanceFragment
-import com.example.for_chour_kotlin.ui.drawer.DrawerFragment
+import com.example.for_chour_kotlin.presentations.fragments.attendance.AttendanceFragment
+import com.example.for_chour_kotlin.presentations.fragments.drawer.DrawerFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -90,11 +91,11 @@ class MainActivity : AppCompatActivity() {
         for (i: Int in 0..imageViews.size-1) {
             if (i==n) {
                 imageViews.get(i).imageTintList = ColorStateList.valueOf(getColor(R.color.menu_click))
-                textViews.get(i).setTextColor(ContextCompat.getColor(this,R.color.menu_click));
+                textViews.get(i).setTextColor(ContextCompat.getColor(this, R.color.menu_click));
             }
             else {
                 imageViews.get(i).imageTintList = ColorStateList.valueOf(getColor(R.color.menu_not_click))
-                textViews.get(i).setTextColor(ContextCompat.getColor(this,R.color.menu_not_click));
+                textViews.get(i).setTextColor(ContextCompat.getColor(this, R.color.menu_not_click));
             }
         }
     }

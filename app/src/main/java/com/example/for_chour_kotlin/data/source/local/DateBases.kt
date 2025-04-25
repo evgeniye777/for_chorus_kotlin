@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.data_manager.connectionSQL
+package com.example.for_chour_kotlin.data.source.local
 
 import android.content.Context
 import android.database.SQLException
@@ -15,7 +15,7 @@ class DataBases(private val mContext: Context) : SQLiteOpenHelper(mContext, DB_N
     companion object {
         private const val DB_NAME = "person.db"
         private var DB_PATH = ""
-        private const val DB_VERSION = 19
+        private const val DB_VERSION = 22
     }
 
     private var mDataBase: SQLiteDatabase? = null

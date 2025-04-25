@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin;
+package com.example.for_chour_kotlin.data.source.remote;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,9 +14,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.for_chour_kotlin.domain.WriteMDB;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ServerClass {
@@ -24,7 +24,7 @@ public class ServerClass {
     public  String postRequest(FragmentActivity content, Context context,final WriteMDB.VolleyCallback callback) {
         final String[] answer = {""};
         RequestQueue requestQueue = Volley.newRequestQueue(content);
-        String url = "https://chelny-dieta.ru/server.php";
+        String url = "https://chelny-dieta.ru/googlenko/server.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

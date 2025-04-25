@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin;
+package com.example.for_chour_kotlin.domain;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -11,9 +11,8 @@ import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson;
-import com.example.for_chour_kotlin.PersonsInfo.infoOneRec;
-import com.example.for_chour_kotlin.data_manager.connectionSQL.DataBases;
+import com.example.for_chour_kotlin.data.source.remote.ServerClass;
+import com.example.for_chour_kotlin.data.source.local.DataBases;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -45,7 +44,7 @@ public class WriteMDB {
         listSpinner = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mdb.rawQuery("SELECT * FROM st", null);
+            cursor = mdb.rawQuery("SELECT * FROM app_st_persons_chorus63_sinch", null);
             if (cursor != null && cursor.moveToLast()) {
                 // Получаем индексы столбцов по их названиям
                 int dateWriteIndex = cursor.getColumnIndex("date_write");
@@ -71,7 +70,7 @@ public class WriteMDB {
                     infoOneRec infoRec = new infoOneRec(date_write, date, purpose);
                     List<String> listRec = new ArrayList<>();
 
-                    for (int n = 8; n < 83; n++) {
+                    for (int n = 7; n < 82; n++) {
                         String cur = cursor.getString(n);
                         listRec.add(cur != null ? cur : "");
                     }
@@ -95,12 +94,12 @@ public class WriteMDB {
     public List<infoOnePerson> readPersonMas() {
         List<infoOnePerson> mas = new ArrayList<>();
         Cursor cursor;
-        cursor = mdb.rawQuery("SELECT * FROM " + "persons"+" ORDER BY "+"name", null);
+        cursor = mdb.rawQuery("SELECT * FROM " + "app_group_chorus63"+" ORDER BY "+"p_name", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             int id = Integer.parseInt(cursor.getString(0));
-            infoOnePerson infoPerson = new infoOnePerson(id,cursor.getString(5),0);
-            infoPerson.setGender(Integer.parseInt(cursor.getString(6)));
+            infoOnePerson infoPerson = new infoOnePerson(id,cursor.getString(4),0);
+            infoPerson.setGender(Integer.parseInt(cursor.getString(5)));
             infoPerson.setAllowed(Integer.parseInt(cursor.getString(7)));
             infoPerson.setVisible(Integer.parseInt(cursor.getString(9)));
             if (infoPerson.getVisible()==1)  mas.add(infoPerson);
@@ -112,18 +111,18 @@ public class WriteMDB {
     public void writeSt(String date, int purpose, List<infoOnePerson> list)
     {
         ContentValues values = getContentValuesST(date,purpose,list);
-        vivod(""+mdb.insert("st",null,values));
+        vivod(""+mdb.insert("app_st_persons_chorus63_sinch",null,values));
     }
 
     public void overWriteSt(String date, int purpose, List<String> list)
     {
         ContentValues values = getContentValuesSTover(date,purpose,list);
-        vivod(""+mdb.update("st",values,"date=?",new String[] {date}));
+        vivod(""+mdb.update("app_st_persons_chorus63_sinch",values,"date=?",new String[] {date}));
     }
 
     public void muDelo()
     {
-        mdb.execSQL("DELETE FROM " + "st");
+        mdb.execSQL("DELETE FROM " + "app_st_persons_chorus63_sinch");
         mdb.close();
     }
 
@@ -133,7 +132,6 @@ public class WriteMDB {
 
         //надо изменить
         values.put("committer", "Гузенко Евгений");
-        values.put("shipped", 1);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -161,7 +159,6 @@ public class WriteMDB {
         ContentValues values = new ContentValues();
 
         values.put("committer", "Гузенко Евгений");
-        values.put("shipped", 1);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -182,15 +179,14 @@ public class WriteMDB {
     public String toSet() {
        StringBuilder request= new StringBuilder();
         Cursor cursor;
-        cursor = mdb.rawQuery("SELECT * FROM " + "st", null);
+        cursor = mdb.rawQuery("SELECT * FROM " + "app_st_persons_chorus63_sinch", null);
         cursor.moveToFirst();
         int count = cursor.getColumnCount();
         while (!cursor.isAfterLast()) {
             for (int i=1;i<count;i++) {
                 String data = cursor.getString(i);
                 if (data!=null&&!data.isEmpty()) {
-                    if (!cursor.getColumnName(i).equals("shipped")) {
-                    request.append(cursor.getColumnName(i)).append("¦").append(cursor.getString(i)).append("¦¦");}
+                    request.append(cursor.getColumnName(i)).append("¦").append(cursor.getString(i)).append("¦¦");
                 }
             }
             if (request.length()>0) {
@@ -230,7 +226,7 @@ public class WriteMDB {
                             values.put(masDate[0],masDate[1]);
                         }catch (Exception e) {message+=""+i+". "+masDate+"; ";}
                     }
-                    message+="\nРезультат: "+mdb.insert("st",null,values)+"\n";
+                    message+="\nРезультат: "+mdb.insert("app_st_persons_chorus63_sinch",null,values)+"\n";
                     i++;
                 }
                 vivodMes(message);
@@ -246,7 +242,7 @@ public class WriteMDB {
     }
 
     public void Del(String date) {
-        mdb.delete("st","date=?",new String[] {date});
+        mdb.delete("app_st_persons_chorus63_sinch","date=?",new String[] {date});
         vivod("Запись удалена");
     }
 

@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.ui
+package com.example.for_chour_kotlin.data.source.remote
 
 import java.io.BufferedReader
 import java.io.DataInputStream

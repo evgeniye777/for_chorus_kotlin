@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.ui.statisticSongs
+package com.example.for_chour_kotlin.presentations.fragments.statisticSongs
 
 import android.os.Bundle
 import android.view.LayoutInflater

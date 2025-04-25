@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.ui.attendance
+package com.example.for_chour_kotlin.presentations.fragments.attendance
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -24,12 +24,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.for_chour_kotlin.PersonsInfo.infoOnePerson
-import com.example.for_chour_kotlin.PersonsInfo.infoOneRec
+import com.example.for_chour_kotlin.domain.infoOnePerson
+import com.example.for_chour_kotlin.domain.infoOneRec
 import com.example.for_chour_kotlin.R
-import com.example.for_chour_kotlin.ServerClass
-import com.example.for_chour_kotlin.data_manager.requests.SendLastDate
-import com.example.for_chour_kotlin.WriteMDB
+import com.example.for_chour_kotlin.data.source.remote.ServerClass
+import com.example.for_chour_kotlin.data.source.remote.SendLastDate
+import com.example.for_chour_kotlin.domain.WriteMDB
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -40,7 +40,8 @@ import java.util.Date
 public class AttendanceFragment : Fragment() {
 
     private var _binding: FragmentAttendanceBinding? = null
-    var serverClass = ServerClass()
+    var serverClass =
+        ServerClass()
     lateinit var writeMDB: WriteMDB
     lateinit var masSpinner: MutableList<String>
     lateinit var masPurpose: List<String>
@@ -72,7 +73,8 @@ public class AttendanceFragment : Fragment() {
         var sdf:SimpleDateFormat = SimpleDateFormat("YYYY.MM.dd")
         val dateString: String = sdf.format(date)
         today = dateString
-        writeMDB = WriteMDB(activity,context)
+        writeMDB =
+            WriteMDB(activity, context)
         listInfoRec = writeMDB.readOneRecMas(today)
         masSpinner = writeMDB.spinnerDay
         personsList = writeMDB.readPersonMas()
@@ -217,7 +219,7 @@ public class AttendanceFragment : Fragment() {
 
         var purpose: Int = spinnerPurpose.selectedItemPosition
         if (cursorRec==-1) {
-            for (infoP:infoOnePerson in personsList) {
+            for (infoP: infoOnePerson in personsList) {
 
                 if (infoP.state==1) {n++
                     if (infoP.gender==2) {n_b++}
@@ -268,7 +270,7 @@ public class AttendanceFragment : Fragment() {
         return "Все: "+n+"/"+nMustAll+" ["+nAbsAll+"]  "+"Б: "+n_b+"/"+nMustAll_b+" ["+nAbsAll_b+"]  "+"С: "+n_s+"/"+nMustAll_s+" ["+nAbsAll_s+"] "
     }
 
-    public fun ViborDate() {
+    fun ViborDate() {
         var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
         if (date.equals("Сегодня")) {date=today;}
         cursorRec = -1

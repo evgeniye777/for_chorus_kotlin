@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.ui.intheskysongs
+package com.example.for_chour_kotlin.presentations.fragments.intheskysongs
 
 import android.os.Bundle
 import android.view.LayoutInflater

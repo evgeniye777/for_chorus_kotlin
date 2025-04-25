@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.ui.drawer
+package com.example.for_chour_kotlin.presentations.fragments.drawer
 
 import android.os.Bundle
 import android.view.LayoutInflater

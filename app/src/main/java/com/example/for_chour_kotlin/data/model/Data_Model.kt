@@ -1,48 +1,106 @@
 package com.example.for_chour_kotlin.data.model
 
 data class AppAllGroups(
-    val id: Int = 0,
-    val version: Int = -1,
-    val hashName: String,
-    val name: String,
-    val date: String,
-    val location: String,
-    val creator: String,
-    val bases: String
+    var id: Int = 0,
+    var version: Int = -1,
+    var hashName: String /*уникальное*/,
+    var name: String,
+    var date: String,
+    var location: String,
+    var creator: String,
+    //ссылки на базы данных
+    var lisnNameBases: List<String>
 )
 
 data class AppAllPersons(
-    val id: Int = 0,
-    val version: Int = -1,
-    val hashName: String,
-    val login: String? = null,
-    val password: String? = null,
-    val hashPassword: String? = null,
-    val name: String? = null,
-    val vName: Int = 1,
-    val email: String? = null,
-    val vEmail: Int = 1,
-    val dateReg: String? = null,
-    val vDateReg: Int = 1,
-    val dateLast: String? = null,
-    val vDateLast: Int = 1,
-    val birthDay: String? = null,
-    val vBirthDay: Int = 1,
-    val gender: String? = null,
-    val vGender: Int = 1,
-    val access: String? = null,
-    val groups: String? = null
+    var id: Int = 0,
+    var version: Int = -1,
+    var hashName: String /*уникальное*/,
+    var login: String? = null,
+    var password: String? = null,
+    var hashPassword: String? = null,
+    var name: String? = null,
+    var vName: Int = 1,
+    var email: String? = null,
+    var vEmail: Int = 1,
+    var dateReg: String? = null,
+    var vDateReg: Int = 1,
+    var dateLast: String? = null,
+    var vDateLast: Int = 1,
+    var birthDay: String? = null,
+    var vBirthDay: Int = 1,
+    var gender: String? = null,
+    var vGender: Int = 1,
+    var access: String? = null,
+    var groups: List<String>
 )
 
-data class AppGroupChorus63(
-    val id: Int = 0,
-    val version: Int = -1,
-    val hashName: String?,
-    val date: String? = null,
-    val pName: String?,
-    val pGender: Int?,
-    val post: String? = null,
-    val allowed: Int = 0,
-    val access: Int = 0,
-    val visible: Int = 1
+data class AppGroupDataParticipants(
+    var id: Int = 0,
+    var version: Int = -1,
+    var hashName: String? /*уникальное*/,
+    var date: String? = null,
+    var pName: String?,
+    var pGender: Int?,
+    var post: String? = null,
+    var allowed: Int = 0,
+    var access: Int = 0,
+    var visible: Int = 1
 )
+
+data class AppStPersonsLocalTime(
+    var id: Int = 0,
+    var committer: String,
+    var dateWrite: String,
+    var date: String,
+    var purpose: Int = 0,
+    var data: String,
+    var comments: String,
+    var c: List<String> = List(75) { "" }
+)
+
+data class AppStPersonsSinch(
+    var id: Int = 0,
+    var committer: String,
+    var dateWrite: String,
+    var date: String,
+    var purpose: Int = 0,
+    var data: String,
+    var comments: String,
+    var c: List<String> = List(75) { "" }
+)
+
+data class AppStSongsHistory(
+    var id: Int = 0, // первичный ключ
+    var committer: String,
+    var dateWrite: String,
+    var date: String,
+    var purpose: Int = 0,
+    var data: String,
+    var comments: String
+)
+
+data class AppStSongsPlans(
+    var id: Int = 0, // первичный ключ, автоинкремент
+    var version: Int = -1,
+    var committer: String,
+    var dateWrite: String,
+    var date: String,
+    var purpose: Int = 0,
+    var data: String,
+    var comments: String,
+    var visible: Int = 1
+)
+
+data class Triger(
+    var id: Int = 0,
+    var name: String,
+    var znak: String
+)
+
+data class Type(
+    var id: Int = 0,
+    var name: String? = null,
+    var values: List<String?> = List(9) { null } // Список из 9 элементов, инициализированных null
+)
+

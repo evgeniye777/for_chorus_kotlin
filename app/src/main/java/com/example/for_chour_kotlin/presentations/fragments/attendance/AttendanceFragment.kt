@@ -14,8 +14,11 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CalendarView
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
@@ -49,6 +52,10 @@ public class AttendanceFragment : Fragment() {
     lateinit var adapterPurpose: ArrayAdapter<String>
     lateinit var personsList: List<infoOnePerson>
     lateinit var listInfoRec: List<infoOneRec>
+
+    lateinit var calendarView: CalendarView
+    lateinit var butShowCalendar: ImageButton
+
     var cursorRec: Int = -1
     var rStart: Boolean = true;
 
@@ -69,8 +76,8 @@ public class AttendanceFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
-        var date: Date = Date()
-        var sdf:SimpleDateFormat = SimpleDateFormat("YYYY.MM.dd")
+        var date = Date()
+        var sdf = SimpleDateFormat("YYYY.MM.dd")
         val dateString: String = sdf.format(date)
         today = dateString
         writeMDB =
@@ -148,6 +155,17 @@ public class AttendanceFragment : Fragment() {
             } else {
             }
         }
+
+
+        calendarView = binding.calendar
+
+        butShowCalendar = binding.idButShowCalendar
+        butShowCalendar.setOnClickListener {
+            show_hide_Calendar()
+        }
+
+        show_hide_Calendar()
+
         return root
     }
 
@@ -177,6 +195,7 @@ public class AttendanceFragment : Fragment() {
         } catch (e: DateTimeParseException) {
             vivod("Укажите правильный формат даты (пример 2025.01.01 -> год.месяц.день)")
         }
+
     }
 
     override fun onDestroyView() {
@@ -268,6 +287,20 @@ public class AttendanceFragment : Fragment() {
             }
         }
         return "Все: "+n+"/"+nMustAll+" ["+nAbsAll+"]  "+"Б: "+n_b+"/"+nMustAll_b+" ["+nAbsAll_b+"]  "+"С: "+n_s+"/"+nMustAll_s+" ["+nAbsAll_s+"] "
+    }
+
+    //метод для показа и скрывания календаря
+    fun show_hide_Calendar() {
+        if (calendarView.visibility == View.VISIBLE) {
+            calendarView.visibility = View.GONE
+            butShowCalendar.setImageResource(R.drawable.img_v_calendar_visible)
+        }
+        else {
+            calendarView.visibility = View.VISIBLE
+            butShowCalendar.setImageResource(R.drawable.img_v_calendar_hide)
+        }
+
+        vivod(""+calendarView.visibility)
     }
 
     fun ViborDate() {

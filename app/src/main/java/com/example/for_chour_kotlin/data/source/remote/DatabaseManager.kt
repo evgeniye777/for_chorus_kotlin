@@ -1,22 +1,24 @@
 package com.example.for_chour_kotlin.data.source.remote
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import com.example.for_chour_kotlin.data.model.AppAllGroups
+import com.example.for_chour_kotlin.data.model.AppOneGroupModel
 import com.example.for_chour_kotlin.data.model.AppAllPersons
+import com.example.for_chour_kotlin.data.model.AppGroupDataParticipant
+import com.example.for_chour_kotlin.data.model.AppStPersons
+import com.example.for_chour_kotlin.data.model.AppStSongsHistory
+import com.example.for_chour_kotlin.data.model.AppStSongsPlans
 import com.example.for_chour_kotlin.data.model.DataChangeListener
-import com.example.for_chour_kotlin.data.model.Shared_View_Model
+import com.example.for_chour_kotlin.presentations._All_View_Models.ViewModel_StaticTable
 import com.example.for_chour_kotlin.data.model.Triger
 import com.example.for_chour_kotlin.data.model.Type
 import com.example.for_chour_kotlin.data.source.local.DataBases
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.IOException
-import java.sql.Types
 
-class DatabaseManager(private val context: Context, private val viewModel: Shared_View_Model) :
+class DatabaseManager(private val context: Context, private val viewModel: ViewModel_StaticTable) :
     DataChangeListener {
     private val databaseHelper: DataBases = DataBases(context)
     private var database: SQLiteDatabase
@@ -44,7 +46,7 @@ class DatabaseManager(private val context: Context, private val viewModel: Share
     @SuppressLint("Range")
     private fun loadGroups() {
         val cursor: Cursor = database.rawQuery("SELECT * FROM app_all_groups", null)
-        val groups = mutableListOf<AppAllGroups>()
+        val groups = mutableListOf<AppOneGroupModel>()
         if (cursor.moveToFirst()) {
             do {
                 val id = cursor.getInt(cursor.getColumnIndex("id"))
@@ -56,7 +58,7 @@ class DatabaseManager(private val context: Context, private val viewModel: Share
                 val creator = cursor.getString(cursor.getColumnIndex("creator"))
                 val bases = cursor.getString(cursor.getColumnIndex("bases"))
 
-                groups.add(AppAllGroups(id, version, hashName, name, date, location, creator, jsonToList(bases)))
+                groups.add(AppOneGroupModel(id, version, hashName, name, date, location, creator, jsonToList(bases)))
             } while (cursor.moveToNext())
         }
         cursor.close()
@@ -178,7 +180,27 @@ class DatabaseManager(private val context: Context, private val viewModel: Share
         return gson.fromJson(json, listType)
     }
 
-    override fun <T> onDataChanged(data: T, action: Int): Int {
+    override fun <T> onStaticDataChanged(data: T, action: Int): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun onParticipantChanged(action: Int, nameTable: String, participant: AppGroupDataParticipant): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun onLocalTimeChanged(action: Int, nameTable: String, participant: AppStPersons): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun onSinchChanged(action: Int, nameTable: String, participant: AppStPersons): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun onSongsHistoryChanged(action: Int, nameTable: String, participant: AppStSongsHistory): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun onSongsPlansChanged(action: Int, nameTable: String, participant: AppStSongsPlans): Int {
         TODO("Not yet implemented")
     }
 }

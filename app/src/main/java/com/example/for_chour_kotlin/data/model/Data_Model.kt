@@ -1,6 +1,6 @@
 package com.example.for_chour_kotlin.data.model
 
-data class AppAllGroups(
+data class AppOneGroupModel(
     var id: Int = 0,
     var version: Int = -1,
     var hashName: String /*уникальное*/,
@@ -9,7 +9,8 @@ data class AppAllGroups(
     var location: String,
     var creator: String,
     //ссылки на базы данных
-    var lisnNameBases: List<String>
+    var lisnNameBases: List<String>,
+    var n_notification: Int = 0
 )
 
 data class AppAllPersons(
@@ -35,13 +36,14 @@ data class AppAllPersons(
     var groups: List<String>
 )
 
-data class AppGroupDataParticipants(
+//модель одного участника группы
+data class AppGroupDataParticipant(
     var id: Int = 0,
     var version: Int = -1,
-    var hashName: String? /*уникальное*/,
+    var hashName: String? = null,
     var date: String? = null,
-    var pName: String?,
-    var pGender: Int?,
+    var pName: String? = null,
+    var pGender: Int? = 0,
     var post: String? = null,
     var allowed: Int = 0,
     var access: Int = 0,
@@ -49,46 +51,47 @@ data class AppGroupDataParticipants(
 )
 
 data class AppStPersonsLocalTime(
-    var id: Int = 0,
-    var committer: String,
-    var dateWrite: String,
-    var date: String,
-    var purpose: Int = 0,
-    var data: String,
-    var comments: String,
-    var c: List<String> = List(75) { "" }
-)
+    override var id: Int = 0,
+    override var committer: String? = null,
+    override var dateWrite: String? = null,
+    override var date: String? = null,
+    override var purpose: Int = 0,
+    override var data: String? = null,
+    override var comments: String? = null,
+    override var c: List<String> = List(75) { "" }
+): AppStPersons
 
 data class AppStPersonsSinch(
-    var id: Int = 0,
-    var committer: String,
-    var dateWrite: String,
-    var date: String,
-    var purpose: Int = 0,
-    var data: String,
-    var comments: String,
-    var c: List<String> = List(75) { "" }
-)
+    var sinch: Boolean = true,
+    override var id: Int = 0,
+    override var committer: String? = null,
+    override var dateWrite: String? = null,
+    override var date: String? = null,
+    override var purpose: Int = 0,
+    override var data: String? = null,
+    override var comments: String? = null,
+    override var c: List<String> = List(75) { "" }
+): AppStPersons
 
 data class AppStSongsHistory(
     var id: Int = 0, // первичный ключ
-    var committer: String,
-    var dateWrite: String,
-    var date: String,
+    var committer: String? = null,
+    var dateWrite: String? = null,
+    var date: String? = null,
     var purpose: Int = 0,
-    var data: String,
-    var comments: String
+    var data: String? = null,
+    var comments: String? = null
 )
 
 data class AppStSongsPlans(
     var id: Int = 0, // первичный ключ, автоинкремент
     var version: Int = -1,
-    var committer: String,
-    var dateWrite: String,
-    var date: String,
+    var committer: String? = null,
+    var dateWrite: String? = null,
+    var date: String? = null,
     var purpose: Int = 0,
-    var data: String,
-    var comments: String,
+    var data: String? = null,
+    var comments: String? = null,
     var visible: Int = 1
 )
 

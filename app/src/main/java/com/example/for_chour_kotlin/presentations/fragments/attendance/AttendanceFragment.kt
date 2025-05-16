@@ -18,7 +18,6 @@ import android.widget.CalendarView
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
@@ -27,8 +26,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.for_chour_kotlin.domain.infoOnePerson
-import com.example.for_chour_kotlin.domain.infoOneRec
+import com.example.for_chour_kotlin.domain.entities.infoOnePerson
+import com.example.for_chour_kotlin.domain.entities.infoOneRec
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.data.source.remote.ServerClass
 import com.example.for_chour_kotlin.data.source.remote.SendLastDate

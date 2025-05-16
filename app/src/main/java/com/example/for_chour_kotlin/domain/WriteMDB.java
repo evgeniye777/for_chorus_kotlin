@@ -13,6 +13,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.example.for_chour_kotlin.data.source.remote.ServerClass;
 import com.example.for_chour_kotlin.data.source.local.DataBases;
+import com.example.for_chour_kotlin.domain.entities.infoOnePerson;
+import com.example.for_chour_kotlin.domain.entities.infoOneRec;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

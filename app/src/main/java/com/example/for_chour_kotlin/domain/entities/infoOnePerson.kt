@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.domain
+package com.example.for_chour_kotlin.domain.entities
 
 class infoOnePerson {
     var id: Int=0

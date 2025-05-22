@@ -3,39 +3,35 @@ package com.example.for_chour_kotlin.domain.cases
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.data.model.AppGroupDataParticipant
 import com.example.for_chour_kotlin.data.model.AppStPersons
+import com.example.for_chour_kotlin.data.model.sinchMark
 
-class MakeStatus {
-    lateinit var appStPersons: List<AppStPersons>
-/*
-    fun get(participant: AppGroupDataParticipant, status: Boolean, purpose:Int,date: String? = null):String? {
-        if (listST == null) {
-            if (mPerson?.state == 0) {
-                mPerson?.state = 1
-                selectLayout?.setBackgroundResource(R.drawable.rect2)
-            } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 ||purpose == 4 ||purpose == 5  ||(purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
-                selectLayout?.setBackgroundResource(R.drawable.rect_gone)
-                mPerson?.state = 0
-            } else {
-                mPerson?.state = 0
-                selectLayout?.setBackgroundResource(R.drawable.rect1)
+class MakeStatus (
+    private var appStPersons: AppStPersons
+){
+    //-1: не синхронизированный, 0: отсутствует, 1 - присутствует, 2 - не обязан
+    fun get(participant: AppGroupDataParticipant, purpose:Int):Int? {
+        //вытягиваем поля, нужные для использования
+        val id: Int = participant.id
+        val s: String = appStPersons.c[id]
+
+        if (s!="p") {
+            appStPersons.c[id] = "p"
+            return R.drawable.rect2;
+        }  else {
+            if (!(participant.allowed in 0..1 && (purpose == 0 ||purpose == 4 ||purpose == 5  ||(purpose == 3 && participant.allowed == 1) || participant.pGender == purpose))) {
+                appStPersons.c[id] = "d"
+                   return R.drawable.rect_gone
             }
-        } else {
-            val purpose: Int = spinnerPurpose.selectedItemPosition
-            val listNow: MutableList<String> = listInfoRec[cursorRec].getRecList()
-            var id: Int = (mPerson?.id ?: 1) - 1
-
-            try {
-                if (listNow[id].isNotEmpty() && listNow[id] != "p") {
-                    listNow[id] = "p"
-                    selectLayout?.setBackgroundResource(R.drawable.rect2)
-                } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 || (purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
-                    selectLayout?.setBackgroundResource(R.drawable.rect_gone)
-                    listNow[id] = "d"
-                } else {
-                    listNow[id] = "n"
-                    selectLayout?.setBackgroundResource(R.drawable.rect_not)
+            else {
+                if ((appStPersons as? sinchMark)?.sinch == false) {
+                    appStPersons.c[id] = "n"
+                    return R.drawable.rect1
                 }
-            } catch (_: Exception) {}
+                else {
+                    appStPersons.c[id] = "n"
+                    return R.drawable.rect_not
+                }
+            }
         }
-    }*/
+    }
 }

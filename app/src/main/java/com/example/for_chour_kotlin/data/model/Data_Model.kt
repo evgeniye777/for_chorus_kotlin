@@ -58,11 +58,11 @@ data class AppStPersonsLocalTime(
     override var purpose: Int = 0,
     override var data: String? = null,
     override var comments: String? = null,
-    override var c: List<String> = List(75) { "" }
+    override var c: MutableList<String>  = MutableList(75) { "" }
 ): AppStPersons
 
 data class AppStPersonsSinch(
-    var sinch: Boolean = true,
+    override var sinch: Boolean = true,
     override var id: Int = 0,
     override var committer: String? = null,
     override var dateWrite: String? = null,
@@ -70,8 +70,8 @@ data class AppStPersonsSinch(
     override var purpose: Int = 0,
     override var data: String? = null,
     override var comments: String? = null,
-    override var c: List<String> = List(75) { "" }
-): AppStPersons
+    override var c: MutableList<String>  = MutableList(75) { "" }
+): AppStPersons,sinchMark
 
 data class AppStSongsHistory(
     var id: Int = 0, // первичный ключ
@@ -84,6 +84,7 @@ data class AppStSongsHistory(
 )
 
 data class AppStSongsPlans(
+    override var sinch: Boolean = true,
     var id: Int = 0, // первичный ключ, автоинкремент
     var version: Int = -1,
     var committer: String? = null,
@@ -93,7 +94,7 @@ data class AppStSongsPlans(
     var data: String? = null,
     var comments: String? = null,
     var visible: Int = 1
-)
+): sinchMark
 
 data class Triger(
     var id: Int = 0,

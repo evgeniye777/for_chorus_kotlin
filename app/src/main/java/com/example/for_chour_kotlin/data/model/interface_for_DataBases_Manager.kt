@@ -14,5 +14,8 @@ interface AppStPersons {
     var purpose: Int
     var data: String?
     var comments: String?
-    var c: List<String>
+    var c: MutableList<String>
+}
+interface sinchMark {
+    var sinch: Boolean
 }

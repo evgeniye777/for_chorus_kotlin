@@ -11,6 +11,7 @@ class DynamicDataRepository(
     private var _songsPlans: MutableLiveData<List<AppStSongsPlans>>
 ) {
 
+    //Метод для добавления объектов(записей) динамических таблиц
     fun <T> addItem(item: T): Int {
         var newId = -1
         when (item) {

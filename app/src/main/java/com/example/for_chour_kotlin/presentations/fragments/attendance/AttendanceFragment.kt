@@ -410,7 +410,7 @@ public class AttendanceFragment : Fragment() {
                     }
                 } catch (_: Exception) {}
             }
-            textInPlace.text = counting().toString()
+            textInPlace.text = counting()
         }
     }
 
@@ -457,6 +457,18 @@ public class AttendanceFragment : Fragment() {
         when (item.itemId) {
             R.id.toSet -> {
                 writeMDB.toSet();
+                return true;
+            }
+            R.id.toSetOne -> {
+                if (cursorRec>=0) {
+                    val sel: Int = spinnerDate.selectedItemPosition
+                    val day: String = masSpinner[sel]
+                    writeMDB.toSetOneDay(day);
+                    return true;
+                }
+                else {
+                    vivod("Выберите сохраненную запись")
+                }
                 return true;
             }
             R.id.toSetLast -> {

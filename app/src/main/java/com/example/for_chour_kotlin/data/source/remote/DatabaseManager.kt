@@ -184,23 +184,9 @@ class DatabaseManager(private val context: Context, private val viewModel: ViewM
         TODO("Not yet implemented")
     }
 
-    override fun onParticipantChanged(action: Int, nameTable: String, participant: AppGroupDataParticipant): Int {
+    override fun <T> onDynamicDataChanged(data: T, nameTable: String?, action: Int): Int {
         TODO("Not yet implemented")
     }
 
-    override fun onLocalTimeChanged(action: Int, nameTable: String, participant: AppStPersons): Int {
-        TODO("Not yet implemented")
-    }
 
-    override fun onSinchChanged(action: Int, nameTable: String, participant: AppStPersons): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun onSongsHistoryChanged(action: Int, nameTable: String, participant: AppStSongsHistory): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun onSongsPlansChanged(action: Int, nameTable: String, participant: AppStSongsPlans): Int {
-        TODO("Not yet implemented")
-    }
 }

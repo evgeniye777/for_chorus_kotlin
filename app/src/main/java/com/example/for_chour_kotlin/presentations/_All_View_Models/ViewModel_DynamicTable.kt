@@ -57,12 +57,25 @@ class ViewModel_DynamicTable : ViewModel() {
 
     // Метод для добавления данных таблиц
     fun <T> addItem(item: T): Int {
-        val newId: Int = listener?.onDynamicDataChanged(item, _nameTable.value,0) ?: -1
+        var newId: Int = 0
+        if (item !is AppStSongsPlans && item !is AppStPersonsSinch) { newId = listener?.onDynamicDataChanged(item, _nameTable.value,0) ?: -1}
         if (newId >= 0) {
             dynamicDataRepository.addItem(item)
         }
         return newId
     }
+    // Метод для синхронизации добавленного объекта ViewModel (нужен только для AppStPersonsSinch и AppStSongsPlans)
+    fun <T> sinchItem(item: T): Int {
+        val newId: Int = listener?.onDynamicDataChanged(item, _nameTable.value,0) ?: -1
+        if (newId >= 0) {
+            if (item is sinchMark) {
+                item.sinch = true
+            }
+            dynamicDataRepository.updateItem(item)
+        }
+        return newId
+    }
+
 
     // Метод для редактирования данных таблиц
     fun <T> updateItem(item: T) {

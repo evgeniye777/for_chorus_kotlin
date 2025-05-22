@@ -6,6 +6,10 @@
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/request" />
     <item
+        android:id="@+id/toSetOne"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/requestOne" />
+    <item
         android:id="@+id/toSetLast"
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/requestLast" />

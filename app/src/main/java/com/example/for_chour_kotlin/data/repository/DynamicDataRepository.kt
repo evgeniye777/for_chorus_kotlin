@@ -2,6 +2,7 @@ package com.example.for_chour_kotlin.data.repository
 
 import androidx.lifecycle.MutableLiveData
 import com.example.for_chour_kotlin.data.model.*
+import com.example.for_chour_kotlin.data.typeData.appGroupDataParticipant.AppGroupDataParticipant
 
 class DynamicDataRepository(
     private var _participants: MutableLiveData<List<AppGroupDataParticipant>>,

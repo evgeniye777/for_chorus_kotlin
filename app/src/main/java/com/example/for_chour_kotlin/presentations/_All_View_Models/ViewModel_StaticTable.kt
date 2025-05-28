@@ -3,12 +3,12 @@ package com.example.for_chour_kotlin.presentations._All_View_Models
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.for_chour_kotlin.data.model.AppAllPersons
 import com.example.for_chour_kotlin.data.model.AppOneGroupModel
 import com.example.for_chour_kotlin.data.model.DataChangeListener
 import com.example.for_chour_kotlin.data.model.Triger
 import com.example.for_chour_kotlin.data.model.Type
 import com.example.for_chour_kotlin.data.repository.StaticDataRepository
+import com.example.for_chour_kotlin.data.typeData.OnePersons.AppAllPersons
 
 class ViewModel_StaticTable : ViewModel() {
 

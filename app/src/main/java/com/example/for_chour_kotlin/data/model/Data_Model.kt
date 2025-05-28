@@ -13,7 +13,7 @@ data class AppOneGroupModel(
     var n_notification: Int = 0
 )
 
-data class AppAllPersons(
+/*data class AppAllPersons(
     var id: Int = 0,
     var version: Int = -1,
     var hashName: String /*уникальное*/,
@@ -34,21 +34,10 @@ data class AppAllPersons(
     var vGender: Int = 1,
     var access: String? = null,
     var groups: List<String>
-)
+)*/
 
 //модель одного участника группы
-data class AppGroupDataParticipant(
-    var id: Int = 0,
-    var version: Int = -1,
-    var hashName: String? = null,
-    var date: String? = null,
-    var pName: String? = null,
-    var pGender: Int? = 0,
-    var post: String? = null,
-    var allowed: Int = 0,
-    var access: Int = 0,
-    var visible: Int = 1
-)
+
 
 data class AppStPersonsLocalTime(
     override var id: Int = 0,

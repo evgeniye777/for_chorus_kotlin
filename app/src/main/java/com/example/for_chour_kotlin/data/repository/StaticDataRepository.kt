@@ -3,9 +3,9 @@ package com.example.for_chour_kotlin.data.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.for_chour_kotlin.data.model.AppOneGroupModel
-import com.example.for_chour_kotlin.data.model.AppAllPersons
 import com.example.for_chour_kotlin.data.model.Triger
 import com.example.for_chour_kotlin.data.model.Type
+import com.example.for_chour_kotlin.data.typeData.OnePersons.AppAllPersons
 
 class StaticDataRepository(
     private var _groups: MutableLiveData<List<AppOneGroupModel>>,

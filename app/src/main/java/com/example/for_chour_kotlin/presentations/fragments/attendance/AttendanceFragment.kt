@@ -23,6 +23,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -31,6 +32,7 @@ import com.example.for_chour_kotlin.domain.entities.infoOneRec
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.data.source.remote.ServerClass
 import com.example.for_chour_kotlin.data.source.remote.SendLastDate
+import com.example.for_chour_kotlin.data.typeData.appDataParticipant.ViewModelAppDataParticipant
 import com.example.for_chour_kotlin.domain.WriteMDB
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
 import java.time.LocalDate
@@ -41,6 +43,7 @@ import java.util.Date
 
 public class AttendanceFragment : Fragment() {
 
+    val vievModelP: ViewModelAppDataParticipant by activityViewModels()
     private var _binding: FragmentAttendanceBinding? = null
     var serverClass =
         ServerClass()

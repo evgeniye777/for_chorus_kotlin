@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.databinding.ActivityMainBinding
 import com.example.for_chour_kotlin.presentations.fragments.attendance.AttendanceFragment
-import com.example.for_chour_kotlin.presentations.fragments.drawer.DrawerFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,26 +34,11 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             replaceFragment(AttendanceFragment(), "SOURS_FRAGMENT")
         }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true); // Показывает кнопку "Назад"
-        supportActionBar?.setHomeButtonEnabled(true); // Делает кнопку "Назад" активной
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.img_menu_drawer_account); // Установите свой значок
-
-
-        dimView = findViewById(R.id.dim_view)
-
         val imgSours: ImageView = findViewById(R.id.img_sours)
-        val imgLike: ImageView = findViewById(R.id.img_like)
-        val imgResponse: ImageView = findViewById(R.id.img_responses)
-        val imgMessage: ImageView = findViewById(R.id.img_message)
-        val imgPorfile: ImageView = findViewById(R.id.img_profile)
-        imageViews = arrayOf(imgSours, imgLike,imgResponse,imgMessage,imgPorfile)
+        imageViews = arrayOf(imgSours)
 
         val textSours: TextView = findViewById(R.id.text_sours)
-        val textLike: TextView = findViewById(R.id.text_like)
-        val textResponse: TextView = findViewById(R.id.text_responses)
-        val textMessage: TextView = findViewById(R.id.text_message)
-        val textPorfile: TextView = findViewById(R.id.text_profile)
-        textViews = arrayOf(textSours, textLike,textResponse,textMessage,textPorfile)
+        textViews = arrayOf(textSours)
         changeColorTextImage(0)
 
         val myLinear_menu_sours: LinearLayout = findViewById(R.id.menu_sours)
@@ -120,46 +104,10 @@ class MainActivity : AppCompatActivity() {
             commit()
         }
     }
-    private fun replaceFragmentDrawer(fragment: Fragment, tag: String) {
-        // Проверяем, существует ли фрагмент
-        val existingFragment = supportFragmentManager.findFragmentByTag(tag)
-        supportFragmentManager.beginTransaction().apply {
-            if (existingFragment == null) {
-                // Фрагмент еще не создан, создаем новый
-                add(R.id.fragment_container_drawer, fragment, tag)
-                dimView.visibility = View.VISIBLE
-            } else {
-                // Фрагмент уже существует, просто меняем видимость
-                if (existingFragment.isVisible) {hide(existingFragment);dimView.visibility = View.GONE}
-                else {show(existingFragment);dimView.visibility = View.VISIBLE}
-            }
-
-            commit()
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                replaceFragmentDrawer(DrawerFragment(), "DRAWER_FRAGMENT")
-                vivod("шторка")
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
 
     fun vivod(s: String) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
     }
 }
-
-/*
-distributionBase=GRADLE_USER_HOME
-distributionPath=wrapper/dists
-distributionUrl=file\:///D:/MyFiles/Trainings/0_Gradle/gradle-8.12.1-bin.zip
-zipStoreBase=GRADLE_USER_HOME
-zipStorePath=wrapper/dists
-*/
 //https\://services.gradle.org/distributions/gradle-8.12.1-bin.zip
 //file\:///D:/MyFiles/Trainings/0_Gradle/gradle-8.12.1-bin.zip

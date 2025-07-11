@@ -1,0 +1,69 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="2dp">
+       <LinearLayout
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:background="@drawable/style_shell12"
+           android:backgroundTint="@color/my_gray2">
+
+           <ImageView
+               android:id="@+id/id_open_drawer"
+               android:layout_width="50dp"
+               android:layout_height="50dp"
+               android:src="@drawable/img_open_drawer"
+               android:paddingLeft="8dp"
+               android:paddingRight="8dp"
+               android:paddingTop="8dp"
+               android:paddingBottom="8dp"
+               android:scaleType="fitXY"
+               app:tint="@color/white" />
+       </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:background="@drawable/style_shell12"
+            android:layout_marginStart="5dp"
+            android:backgroundTint="@color/my_gray2">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:layout_weight="5"
+                android:background="@android:color/transparent"
+                android:layout_marginStart="10dp"
+                android:paddingStart="15dp"
+                android:hint="Поиск"
+                android:textColor="@color/material_dynamic_neutral99"
+                android:textColorHint="@color/white"
+                android:textSize="18dp" />
+
+            <ImageView
+                android:id="@+id/id_sours"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="11dp"
+                android:paddingBottom="11dp"
+                android:src="@drawable/img_sours"
+                app:tint="@color/white" />
+            <ImageView
+                android:id="@+id/id_icon_my_menu"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"
+                android:paddingTop="11dp"
+                android:paddingBottom="11dp"
+                android:src="@drawable/img_open_my_menu"
+                app:tint="@color/white" />
+        </LinearLayout>
+    </LinearLayout>

@@ -1,15 +1,15 @@
 package com.example.for_chour_kotlin.domain.cases
 
 import com.example.for_chour_kotlin.R
-import com.example.for_chour_kotlin.data.model.AppGroupDataParticipant
 import com.example.for_chour_kotlin.data.model.AppStPersons
 import com.example.for_chour_kotlin.data.model.sinchMark
+import com.example.for_chour_kotlin.data.typeData.appDataParticipant.AppDataParticipant
 
 class MakeStatus (
     private var appStPersons: AppStPersons
 ){
     //-1: не синхронизированный, 0: отсутствует, 1 - присутствует, 2 - не обязан
-    fun get(participant: AppGroupDataParticipant, purpose:Int):Int? {
+    fun get(participant: AppDataParticipant, purpose:Int):Int? {
         //вытягиваем поля, нужные для использования
         val id: Int = participant.id
         val s: String = appStPersons.c[id]

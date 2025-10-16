@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.data.typeData.appStPersonsSinch
+package com.example.for_chour_kotlin.data.typeData.appStPersons
 
 import android.database.sqlite.SQLiteDatabase
 import androidx.lifecycle.LiveData
@@ -6,14 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
 
-class ViewModelAppStPersonsSinch() : ViewModel(), DataOperations<AppStPersonsSinch> {
+class ViewModelAppStPersons() : ViewModel(), DataOperations<AppStPersons> {
 
     var database: SQLiteDatabase? = null
-    var localbdAppStPersonsSinch: LocalBDAppStPersonsSinch? = null
-    var repositoryAppStPersonsSinch: RepositoryAppStPersonsSinch? = null
+    var localbdAppStPersons: LocalBDAppStPersons? = null
+    var repositoryAppStPersons: RepositoryAppStPersons? = null
 
-    private val _groups = MutableLiveData<List<AppStPersonsSinch>?>()
-    val groups: LiveData<List<AppStPersonsSinch>?> get() = _groups
+    private val _groups = MutableLiveData<List<AppStPersons>?>()
+    val stPersons: LiveData<List<AppStPersons>?> get() = _groups
 
     lateinit var nameTable: String
 
@@ -26,44 +26,44 @@ class ViewModelAppStPersonsSinch() : ViewModel(), DataOperations<AppStPersonsSin
         if (database == null || nameTable.isEmpty()) {
             return -1
         }
-        localbdAppStPersonsSinch = LocalBDAppStPersonsSinch(database!!)
-        repositoryAppStPersonsSinch = RepositoryAppStPersonsSinch(_groups)
-        repositoryAppStPersonsSinch?.setItems(localbdAppStPersonsSinch!!.readItems(nameTable))
+        localbdAppStPersons = LocalBDAppStPersons(database!!)
+        repositoryAppStPersons = RepositoryAppStPersons(_groups)
+        repositoryAppStPersons?.setItems(localbdAppStPersons!!.readItems(nameTable))
         return 1
     }
 
     // Метод для добавления данных в таблицы
-    override fun addItem(item: AppStPersonsSinch): Int {
-        val newId: Int = localbdAppStPersonsSinch?.addItem(item) ?: -1
+    override fun addItem(item: AppStPersons): Int {
+        val newId: Int = localbdAppStPersons?.addItem(item) ?: -1
         if (newId >= 0) {
-            repositoryAppStPersonsSinch?.addItem(item.copy(id = newId))
+            repositoryAppStPersons?.addItem(item.copy(id = newId))
         }
         return newId
     }
 
     // Метод для редактирования данных в таблицах
-    override fun updateItem(item: AppStPersonsSinch): Int {
-        val n: Int = localbdAppStPersonsSinch?.updateItem(item) ?: -1
+    override fun updateItem(item: AppStPersons): Int {
+        val n: Int = localbdAppStPersons?.updateItem(item) ?: -1
         if (n > 0) { // Проверяем, что обновление прошло успешно
-            repositoryAppStPersonsSinch?.updateItem(item)
+            repositoryAppStPersons?.updateItem(item)
         }
         return n
     }
 
     // Метод для неполного удаления данных из таблиц
-    override fun deleteItem(item: AppStPersonsSinch): Int {
-        val n: Int = localbdAppStPersonsSinch?.deleteItem(item) ?: -1
+    override fun deleteItem(item: AppStPersons): Int {
+        val n: Int = localbdAppStPersons?.deleteItem(item) ?: -1
         if (n > 0) { // Проверяем, что удаление прошло успешно
-            repositoryAppStPersonsSinch?.deleteItem(item)
+            repositoryAppStPersons?.deleteItem(item)
         }
         return n
     }
 
     // Метод для полного удаления данных из таблиц
-    override fun destroyItem(item: AppStPersonsSinch): Int {
-        val n: Int = localbdAppStPersonsSinch?.destroyItem(item) ?: -1
+    override fun destroyItem(item: AppStPersons): Int {
+        val n: Int = localbdAppStPersons?.destroyItem(item) ?: -1
         if (n > 0) { // Проверяем, что удаление прошло успешно
-            repositoryAppStPersonsSinch?.deleteItem(item)
+            repositoryAppStPersons?.deleteItem(item)
         }
         return n
     }
@@ -71,7 +71,7 @@ class ViewModelAppStPersonsSinch() : ViewModel(), DataOperations<AppStPersonsSin
     // Метод для удаления таблиц
     override fun deleteTable(nameTable0: String): Int {
         val nameTable = nameTable0.ifEmpty { this.nameTable }
-        val n = localbdAppStPersonsSinch?.deleteTable(nameTable) ?: -1
+        val n = localbdAppStPersons?.deleteTable(nameTable) ?: -1
         if (n == 1) {
             setItems(null)
         }
@@ -83,7 +83,7 @@ class ViewModelAppStPersonsSinch() : ViewModel(), DataOperations<AppStPersonsSin
         if (nameTable0.isEmpty()) {
             return -1
         }
-        val n = localbdAppStPersonsSinch?.createTable(nameTable) ?: -1
+        val n = localbdAppStPersons?.createTable(nameTable) ?: -1
         return n
     }
 }

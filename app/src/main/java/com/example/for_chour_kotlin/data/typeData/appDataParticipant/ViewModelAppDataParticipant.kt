@@ -3,7 +3,9 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
+import kotlin.plus
 
 class ViewModelAppDataParticipant() : ViewModel(), DataOperations<AppDataParticipant> {
 
@@ -11,8 +13,8 @@ class ViewModelAppDataParticipant() : ViewModel(), DataOperations<AppDataPartici
     var localbdAppDataParticipant: LocalBDAppDataParticipant? = null
     var repositoryAppDataParticipant: RepositoryAppDataParticipant? = null
 
-    private val _groups = MutableLiveData<List<AppDataParticipant>?>()
-    val groups: LiveData<List<AppDataParticipant>?> get() = _groups
+    private val _participants = MutableLiveData<List<AppDataParticipant>?>()
+    val participants: LiveData<List<AppDataParticipant>?> get() = _participants
 
     lateinit var nameTable: String
 
@@ -22,7 +24,7 @@ class ViewModelAppDataParticipant() : ViewModel(), DataOperations<AppDataPartici
         this.nameTable = nameTable
         if (database == null || nameTable.isEmpty()) { return -1 }
         localbdAppDataParticipant = LocalBDAppDataParticipant(database!!)
-        repositoryAppDataParticipant = RepositoryAppDataParticipant(_groups)
+        repositoryAppDataParticipant = RepositoryAppDataParticipant(_participants)
         repositoryAppDataParticipant?.setItems(localbdAppDataParticipant!!.readItems(nameTable))
         return 1
     }
@@ -43,6 +45,16 @@ class ViewModelAppDataParticipant() : ViewModel(), DataOperations<AppDataPartici
             repositoryAppDataParticipant?.updateItem(item)
         }
         return n
+    }
+
+    override fun addOrUpdateItem(item: AppDataParticipant): Int {
+        val currentList = _participants.value ?: emptyList()
+        val existingItem = currentList.find { it.id == item.id }
+        return if (existingItem != null) {
+            updateItem(item)
+        } else {
+            addItem(item)
+        }
     }
 
     // Метод для неполного удаления данных из таблиц
@@ -76,5 +88,9 @@ class ViewModelAppDataParticipant() : ViewModel(), DataOperations<AppDataPartici
         if (nameTable0.isEmpty()) { return -1 }
         val n = localbdAppDataParticipant?.createTable(nameTable) ?: -1
         return n
+    }
+
+    fun hideData() {
+        _participants.value = emptyList()
     }
 }

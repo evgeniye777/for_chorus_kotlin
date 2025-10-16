@@ -3,9 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="menu_text_size">12dp</dimen>
-    <dimen name="menu_linear_size">50dp</dimen>
-    <dimen name="menu_margin_img_size">8dp</dimen>
-    <dimen name="menu_margin_img_size2">5dp</dimen>
     <dimen name="menu_margin_text_size">1dp</dimen>
     <dimen name="menu_margin_recomend">9dp</dimen>
     <dimen name="menu_margin_vacancies">15dp</dimen>

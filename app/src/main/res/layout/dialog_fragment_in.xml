@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/dialogEditTextLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Логин"
+        android:text="evgeniye"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/dialogEditTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="12345"
+        android:hint="Пароль"
+        android:inputType="textPassword"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

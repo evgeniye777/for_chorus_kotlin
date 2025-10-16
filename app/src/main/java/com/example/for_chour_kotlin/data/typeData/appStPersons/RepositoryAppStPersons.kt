@@ -1,18 +1,18 @@
-package com.example.for_chour_kotlin.data.typeData.appStPersonsLocalTime
+package com.example.for_chour_kotlin.data.typeData.appStPersons
 
 import androidx.lifecycle.MutableLiveData
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
 
-class RepositoryAppStPersonsLocalTime(private var _groups: MutableLiveData<List<AppStPersonsLocalTime>?>) :
-    DataOperations<AppStPersonsLocalTime> {
+class RepositoryAppStPersons(private var _groups: MutableLiveData<List<AppStPersons>?>) :
+    DataOperations<AppStPersons> {
 
     // Метод для установки списка
-    override fun setItems(list: MutableList<AppStPersonsLocalTime>?) {
+    override fun setItems(list: MutableList<AppStPersons>?) {
         _groups.value = list
     }
 
     // Метод для добавления данных в таблицы 
-    override fun addItem(item: AppStPersonsLocalTime): Int {
+    override fun addItem(item: AppStPersons): Int {
         var newId: Int = -1
         val currentList = _groups.value ?: emptyList()
         newId = currentList.size + 1
@@ -21,7 +21,7 @@ class RepositoryAppStPersonsLocalTime(private var _groups: MutableLiveData<List<
     }
 
     // Метод для редактирования данных в таблицах
-    override fun updateItem(item: AppStPersonsLocalTime): Int {
+    override fun updateItem(item: AppStPersons): Int {
         val currentList = _groups.value?.toMutableList() ?: mutableListOf()
         val index = currentList.indexOfFirst { it.id == item.id }
         if (index != -1) {
@@ -32,7 +32,7 @@ class RepositoryAppStPersonsLocalTime(private var _groups: MutableLiveData<List<
     }
 
     // Метод для удаления данных из таблиц
-    override fun deleteItem(item: AppStPersonsLocalTime): Int {
+    override fun deleteItem(item: AppStPersons): Int {
         val currentList = _groups.value?.toMutableList() ?: mutableListOf()
         val index = currentList.indexOfFirst { it.id == item.id }
         currentList.removeIf { it.id == index }

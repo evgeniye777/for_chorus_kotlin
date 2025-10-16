@@ -115,13 +115,13 @@ class LocalBDAppStSongsHistory(
         try {
             val createTableQuery = """
 CREATE TABLE IF NOT EXISTS $nameTable (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    committer TEXT NOT NULL,
-    date_write TEXT NOT NULL,
-    date TEXT NOT NULL,
-    purpose INTEGER NOT NULL  DEFAULT 0,
-    data TEXT NOT NULL,
-    comments TEXT NOT NULL
+    id INTEGER UNIQUE,
+    committer TEXT
+    date_write TEXT,
+    date TEXT,
+    purpose INTEGER,
+    data TEXT,
+    comments TEXT
 )
 """.trimIndent()
             database.execSQL(createTableQuery)

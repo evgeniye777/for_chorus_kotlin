@@ -18,7 +18,7 @@ data class AppAllPersons(
     var vGender: Int = 1,
     var access: String,
     var accessP: String,
-    var groups: MutableList<String> = mutableListOf(),
+    var groups: HashMap<String, String>? = null,
     var groupsP: String,
     var visible: Int = 1
 )

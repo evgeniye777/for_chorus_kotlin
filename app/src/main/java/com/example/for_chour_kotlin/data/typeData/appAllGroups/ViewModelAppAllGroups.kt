@@ -1,6 +1,4 @@
 package com.example.for_chour_kotlin.data.typeData.appAllGroups
-
-import com.example.for_chour_kotlin.data.typeData._cases.JsonWork
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
 import android.database.sqlite.SQLiteDatabase
 import androidx.lifecycle.LiveData
@@ -16,6 +14,9 @@ class ViewModelAppAllGroups() : ViewModel(), DataOperations<AppAllGroups> {
     private val _groups = MutableLiveData<List<AppAllGroups>?>()
     val groups: LiveData<List<AppAllGroups>?> get() = _groups
 
+    private val _focus = MutableLiveData<AppAllGroups?>()
+    val focus: LiveData<AppAllGroups?> get() = _focus
+
     lateinit var nameTable: String
 
     // Метод для подключения к таблице(создает при отстутствии)
@@ -26,7 +27,13 @@ class ViewModelAppAllGroups() : ViewModel(), DataOperations<AppAllGroups> {
         localbdAppAllGroups = LocalBDAppAllGroups(database!!)
         repositoryAppAllGroups = RepositoryAppAllGroups(_groups)
         repositoryAppAllGroups?.setItems(localbdAppAllGroups!!.readItems(nameTable))
+
+        _focus.value = groups.value?.firstOrNull()
         return 1
+    }
+
+    fun setFocus(group: AppAllGroups?) {
+        _focus.value = group
     }
 
     // Метод для добавления данных в таблицы
@@ -45,6 +52,16 @@ class ViewModelAppAllGroups() : ViewModel(), DataOperations<AppAllGroups> {
             repositoryAppAllGroups?.updateItem(item)
         }
         return n
+    }
+
+    override fun addOrUpdateItem(item: AppAllGroups): Int {
+        val currentList = _groups.value ?: emptyList()
+        val existingItem = currentList.find { it.id == item.id }
+        return if (existingItem != null) {
+            updateItem(item)
+        } else {
+            addItem(item)
+        }
     }
 
     // Метод для неполного удаления данных из таблиц
@@ -78,5 +95,10 @@ class ViewModelAppAllGroups() : ViewModel(), DataOperations<AppAllGroups> {
         if (nameTable0.isEmpty()) { return -1 }
         val n = localbdAppAllGroups?.createTable(nameTable) ?: -1
         return n
+    }
+
+    fun hideData() {
+        _groups.value = emptyList()
+        _focus.value = null
     }
 }

@@ -64,7 +64,7 @@ class LocalBDAppAllPersons(
                     v_gender,
                     access,
                     access_p,
-                    jsW.jsonToList(groups),
+                    jsW.jsonToListH(groups),
                     groups_p,
                     visible
                 ))
@@ -93,7 +93,7 @@ class LocalBDAppAllPersons(
             put("v_gender", item.vGender)
             put("access", item.access)
             put("access_p", item.accessP)
-            put("groups", jsW.listToJson(item.groups))
+            put("groups", jsW.listToJsonH(item.groups))
             put("groups_p", item.groupsP)
             put("visible", item.visible)
         }
@@ -119,7 +119,7 @@ class LocalBDAppAllPersons(
             put("v_gender", item.vGender)
             put("access", item.access)
             put("access_p", item.accessP)
-            put("groups", jsW.listToJson(item.groups))
+            put("groups", jsW.listToJsonH(item.groups))
             put("groups_p", item.groupsP)
             put("visible", item.visible)
         }
@@ -165,26 +165,26 @@ class LocalBDAppAllPersons(
         try {
             val createTableQuery = """
 CREATE TABLE IF NOT EXISTS $nameTable (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    version INTEGER NOT NULL  DEFAULT -1,
-    hash_name TEXT NOT NULL UNIQUE,
+    id INTEGER UNIQUE,
+    version INTEGER,
+    hash_name TEXT UNIQUE,
     name TEXT,
-    v_name INTEGER NOT NULL  DEFAULT 1,
+    v_name INTEGER,
     email TEXT,
-    v_email INTEGER NOT NULL  DEFAULT 1,
+    v_email INTEGER,
     date_reg TEXT,
-    v_date_reg INTEGER NOT NULL  DEFAULT 1,
+    v_date_reg INTEGER,
     date_last TEXT,
-    v_date_last INTEGER NOT NULL  DEFAULT 1,
+    v_date_last INTEGER,
     birth_day TEXT,
-    v_birth_day INTEGER NOT NULL  DEFAULT 1,
+    v_birth_day INTEGER,
     gender TEXT,
-    v_gender INTEGER NOT NULL  DEFAULT 1,
+    v_gender INTEGER,
     access TEXT,
     access_p TEXT,
     groups TEXT,
     groups_p TEXT,
-    visible INTEGER NOT NULL  DEFAULT 1
+    visible INTEGER
 )
 """.trimIndent()
             database.execSQL(createTableQuery)

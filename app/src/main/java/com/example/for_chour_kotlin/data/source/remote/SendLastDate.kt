@@ -33,13 +33,11 @@ class SendLastDate {
         try {
             basa!!.updateDataBase()
         } catch (mIOException: IOException) {
-            vivodMes("basa")
             throw Error("UnableToUpdateDatabase")
         }
         try {
             mdb = basa!!.writableDatabase
         } catch (mSQLException: SQLException) {
-            vivodMes("mdb")
             throw mSQLException
         }
 
@@ -50,7 +48,6 @@ class SendLastDate {
                 try {
                     val jsonObject = JSONObject(response) // Создание JSONObject из строки
                     val lastId = jsonObject.getInt("last_id")
-                    vivodMes(""+lastId) // Обработка успешного ответа
                     fetchLocalData(lastId) // Вызов метода для получения данных из локальной базы
                 }catch (e:Exception) {vivodMes(e.toString())}
             },

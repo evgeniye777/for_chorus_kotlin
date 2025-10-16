@@ -3,7 +3,6 @@
     android:id="@+id/nav_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="7dp"
     android:background="?android:attr/windowBackground"
     android:orientation="vertical">
     <View
@@ -19,21 +18,18 @@
             layout="@layout/menu_item_bottom"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:fitsSystemWindows="true"
             android:layout_height="match_parent" />
         <include
             android:id="@+id/menu_like"
             layout="@layout/menu_item_bottom"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:fitsSystemWindows="true"
             android:layout_height="match_parent" />
         <include
             android:id="@+id/menu_responses"
             layout="@layout/menu_item_bottom"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:fitsSystemWindows="true"
             android:layout_height="match_parent" />
 
         <include
@@ -41,14 +37,12 @@
             layout="@layout/menu_item_bottom"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:fitsSystemWindows="true"
             android:layout_height="match_parent" />
         <include
             android:id="@+id/menu_profile"
             layout="@layout/menu_item_bottom"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:fitsSystemWindows="true"
             android:layout_height="match_parent" />
     </LinearLayout>
 </LinearLayout>

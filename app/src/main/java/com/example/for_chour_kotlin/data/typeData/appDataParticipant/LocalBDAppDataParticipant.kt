@@ -3,6 +3,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import com.example.for_chour_kotlin.data.typeData._cases.JsonWork
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
 
 class LocalBDAppDataParticipant(
@@ -10,6 +11,7 @@ class LocalBDAppDataParticipant(
 ) : DataOperations<AppDataParticipant> {
 
     private lateinit var nameTable: String
+    val jsW: JsonWork = JsonWork()
 
     // Локальная выгрузка всех данных
     @SuppressLint("Range")
@@ -43,7 +45,7 @@ class LocalBDAppDataParticipant(
                     date,
                     p_name,
                     p_gender,
-                    post,
+                    jsW.jsonToList(post),
                     allowed,
                     access,
                     visible
@@ -54,8 +56,20 @@ class LocalBDAppDataParticipant(
         return appdataparticipant
     }
 
+    private fun existsById(id: Int): Boolean {
+        if (id < 0) return false
+        val query = "SELECT id FROM $nameTable WHERE id = ? LIMIT 1"
+        val cursor = database.rawQuery(query, arrayOf(id.toString()))
+        return try {
+            cursor.moveToFirst() // Если true — существует
+        } finally {
+            cursor.close()
+        }
+    }
+
     // Добавление данных в таблицу
     override fun addItem(item: AppDataParticipant): Int {
+        if (existsById(item.id)) {return updateItem(item);}
         val values = ContentValues().apply {
             put("id_c", item.idC)
             put("version", item.version)
@@ -63,7 +77,7 @@ class LocalBDAppDataParticipant(
             put("date", item.date)
             put("p_name", item.pName)
             put("p_gender", item.pGender)
-            put("post", item.post)
+            put("post", jsW.listToJson(item.post))
             put("allowed", item.allowed)
             put("access", item.access)
             put("visible", item.visible)
@@ -80,7 +94,7 @@ class LocalBDAppDataParticipant(
             put("date", item.date)
             put("p_name", item.pName)
             put("p_gender", item.pGender)
-            put("post", item.post)
+            put("post", jsW.listToJson(item.post))
             put("allowed", item.allowed)
             put("access", item.access)
             put("visible", item.visible)
@@ -127,17 +141,17 @@ class LocalBDAppDataParticipant(
         try {
             val createTableQuery = """
 CREATE TABLE IF NOT EXISTS $nameTable (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_c TEXT NOT NULL UNIQUE,
-    version INTEGER NOT NULL  DEFAULT -1,
-    hash_name TEXT NOT NULL UNIQUE,
+    id INTEGER UNIQUE,
+    id_c TEXT UNIQUE,
+    version INTEGER,
+    hash_name TEXT UNIQUE,
     date TEXT,
-    p_name TEXT NOT NULL,
-    p_gender INTEGER NOT NULL,
-    post TEXT NOT NULL,
-    allowed INTEGER NOT NULL  DEFAULT 0,
-    access INTEGER NOT NULL  DEFAULT 0,
-    visible INTEGER NOT NULL  DEFAULT 1
+    p_name TEXT,
+    p_gender INTEGER,
+    post TEXT,
+    allowed INTEGER,
+    access INTEGER,
+    visible INTEGER
 )
 """.trimIndent()
             database.execSQL(createTableQuery)

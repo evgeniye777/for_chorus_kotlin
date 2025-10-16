@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import com.example.for_chour_kotlin.data.source.url_responses.AccountHolder
 import com.example.for_chour_kotlin.data.typeData._cases.JsonWork
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
 
@@ -38,38 +39,52 @@ class LocalBDAppAllGroups(
                 val data = cursor.getString(cursor.getColumnIndex("data"))
                 val n_notification = cursor.getInt(cursor.getColumnIndex("n_notification"))
                 val visible = cursor.getInt(cursor.getColumnIndex("visible"))
-                appallgroups.add(
-                    AppAllGroups(
-                        id,
-                        version,
-                        hash_name,
-                        name,
-                        date,
-                        location,
-                        creator,
-                        jsW.jsonToList(list_name_bases),
-                        jsW.jsonToListHH(data),
-                        n_notification,
-                        visible
+
+                    appallgroups.add(
+                        AppAllGroups(
+                            id,
+                            version,
+                            hash_name,
+                            name,
+                            date,
+                            location,
+                            creator,
+                            jsW.jsonToListH(list_name_bases),
+                            jsW.jsonToTypeDataList(data),
+                            n_notification,
+                            visible
+                        )
                     )
-                )
             } while (cursor.moveToNext())
         }
         cursor.close()
         return appallgroups
     }
 
+    // Вспомогательный метод: Проверить существование по id
+    private fun existsById(id: Int): Boolean {
+        if (id < 0) return false
+        val query = "SELECT id FROM $nameTable WHERE id = ? LIMIT 1"
+        val cursor = database.rawQuery(query, arrayOf(id.toString()))
+        return try {
+            cursor.moveToFirst() // Если true — существует
+        } finally {
+            cursor.close()
+        }
+    }
+
     // Добавление данных в таблицу
     override fun addItem(item: AppAllGroups): Int {
+        if (existsById(item.id)) {return updateItem(item);}
         val values = ContentValues().apply {
             put("version", item.version)
             put("hash_name", item.hashName)
             put("name", item.name)
-            put("date", item.date)
+            put("date", item.date_create)
             put("location", item.location)
             put("creator", item.creator)
-            put("list_name_bases", jsW.listToJson(item.listNameBases))
-            put("data", item.data?.let { jsW.listToJsonHH(it) })
+            put("list_name_bases", jsW.listToJsonH(item.listNameBases))
+            put("data", item.data?.let { jsW.typeDataListToJson(it) })
             put("n_notification", item.nNotification)
             put("visible", item.visible)
         }
@@ -82,11 +97,11 @@ class LocalBDAppAllGroups(
             put("version", item.version)
             put("hash_name", item.hashName)
             put("name", item.name)
-            put("date", item.date)
+            put("date", item.date_create)
             put("location", item.location)
             put("creator", item.creator)
-            put("list_name_bases", jsW.listToJson(item.listNameBases))
-            put("data", item.data?.let { jsW.listToJsonHH(it) })
+            put("list_name_bases", jsW.listToJsonH(item.listNameBases))
+            put("data", item.data?.let { jsW.typeDataListToJson(it) })
             put("n_notification", item.nNotification)
             put("visible", item.visible)
         }
@@ -132,17 +147,17 @@ class LocalBDAppAllGroups(
         try {
             val createTableQuery = """
 CREATE TABLE IF NOT EXISTS $nameTable (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    version INTEGER NOT NULL  DEFAULT -1,
-    hash_name TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL,
-    date TEXT NOT NULL,
-    location TEXT NOT NULL,
-    creator TEXT NOT NULL,
-    list_name_bases TEXT NOT NULL,
-    data TEXT NOT NULL,
-    n_notification INTEGER NOT NULL  DEFAULT 0,
-    visible INTEGER NOT NULL  DEFAULT 1
+    id INTEGER UNIQUE,
+    version INTEGER,
+    hash_name TEXT UNIQUE,
+    name TEXT UNIQUE,
+    date TEXT,
+    location TEXT,
+    creator TEXT,
+    list_name_bases TEXT,
+    data TEXT,
+    n_notification INTEGER,
+    visible INTEGER
 )
 """.trimIndent()
             database.execSQL(createTableQuery)

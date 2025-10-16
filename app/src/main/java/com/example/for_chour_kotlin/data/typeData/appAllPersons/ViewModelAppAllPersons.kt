@@ -12,8 +12,8 @@ class ViewModelAppAllPersons() : ViewModel(), DataOperations<AppAllPersons> {
     var localbdAppAllPersons: LocalBDAppAllPersons? = null
     var repositoryAppAllPersons: RepositoryAppAllPersons? = null
 
-    private val _groups = MutableLiveData<List<AppAllPersons>?>()
-    val groups: LiveData<List<AppAllPersons>?> get() = _groups
+    private val _persons = MutableLiveData<List<AppAllPersons>?>()
+    val persons: LiveData<List<AppAllPersons>?> get() = _persons
 
     lateinit var nameTable: String
 
@@ -23,7 +23,7 @@ class ViewModelAppAllPersons() : ViewModel(), DataOperations<AppAllPersons> {
         this.nameTable = nameTable
         if (database == null || nameTable.isEmpty()) { return -1 }
         localbdAppAllPersons = LocalBDAppAllPersons(database!!)
-        repositoryAppAllPersons = RepositoryAppAllPersons(_groups)
+        repositoryAppAllPersons = RepositoryAppAllPersons(_persons)
         repositoryAppAllPersons?.setItems(localbdAppAllPersons!!.readItems(nameTable))
         return 1
     }

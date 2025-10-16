@@ -1,4 +1,4 @@
-package com.example.for_chour_kotlin.data.typeData.appStPersonsLocalTime
+package com.example.for_chour_kotlin.data.typeData.appStPersons
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -7,23 +7,23 @@ import android.database.sqlite.SQLiteDatabase
 import com.example.for_chour_kotlin.data.typeData._cases.JsonWork
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
 
-class LocalBDAppStPersonsLocalTime(
+class LocalBDAppStPersons(
     private val database: SQLiteDatabase
-) : DataOperations<AppStPersonsLocalTime> {
+) : DataOperations<AppStPersons> {
 
     private lateinit var nameTable: String
     val jsW: JsonWork = JsonWork()
 
     // Локальная выгрузка всех данных
     @SuppressLint("Range")
-    override fun readItems(nameTable: String): MutableList<AppStPersonsLocalTime> {
+    override fun readItems(nameTable: String): MutableList<AppStPersons> {
         this.nameTable = nameTable
 
         if (!isTableExists(nameTable)) {
             createTable(nameTable)
         }
         val cursor: Cursor = database.rawQuery("SELECT * FROM $nameTable", null)
-        val appstpersonslocaltime = mutableListOf<AppStPersonsLocalTime>()
+        val appstpersonssinches = mutableListOf<AppStPersons>()
 
         if (cursor.moveToFirst()) {
             do {
@@ -35,8 +35,9 @@ class LocalBDAppStPersonsLocalTime(
                 val data = cursor.getString(cursor.getColumnIndex("data"))
                 val comments = cursor.getString(cursor.getColumnIndex("comments"))
                 val c = cursor.getString(cursor.getColumnIndex("c"))
-                appstpersonslocaltime.add(
-                    AppStPersonsLocalTime(
+                val sinch = cursor.getInt(cursor.getColumnIndex("sinch"))
+                appstpersonssinches.add(
+                    AppStPersons(
                         id,
                         committer,
                         date_write,
@@ -44,17 +45,18 @@ class LocalBDAppStPersonsLocalTime(
                         purpose,
                         data,
                         comments,
-                        jsW.jsonToList(c)
+                        jsW.jsonToListH(c),
+                        sinch
                     )
                 )
             } while (cursor.moveToNext())
         }
         cursor.close()
-        return appstpersonslocaltime
+        return appstpersonssinches
     }
 
     // Добавление данных в таблицу
-    override fun addItem(item: AppStPersonsLocalTime): Int {
+    override fun addItem(item: AppStPersons): Int {
         val values = ContentValues().apply {
             put("committer", item.committer)
             put("date_write", item.dateWrite)
@@ -62,13 +64,14 @@ class LocalBDAppStPersonsLocalTime(
             put("purpose", item.purpose)
             put("data", item.data)
             put("comments", item.comments)
-            put("c", jsW.listToJson(item.c))
+            put("c", jsW.listToJsonH(item.c))
+            put("sinch", item.sinch)
         }
         return database.insert(nameTable, null, values).toInt() // Возвращаем новый ID
     }
 
     // Обновление данных в таблице
-    override fun updateItem(item: AppStPersonsLocalTime): Int {
+    override fun updateItem(item: AppStPersons): Int {
         val values = ContentValues().apply {
             put("committer", item.committer)
             put("date_write", item.dateWrite)
@@ -76,7 +79,8 @@ class LocalBDAppStPersonsLocalTime(
             put("purpose", item.purpose)
             put("data", item.data)
             put("comments", item.comments)
-            put("c", jsW.listToJson(item.c))
+            put("c", jsW.listToJsonH(item.c))
+            put("sinch", item.sinch)
         }
         return database.update(
             nameTable, values, "id=?", arrayOf(item.id.toString())
@@ -84,12 +88,12 @@ class LocalBDAppStPersonsLocalTime(
     }
 
     // Возобновляемое удаление из таблицы
-    override fun deleteItem(item: AppStPersonsLocalTime): Int {
+    override fun deleteItem(item: AppStPersons): Int {
         return destroyItem(item)
     }
 
     // Абсолютное удаление из таблицы
-    override fun destroyItem(item: AppStPersonsLocalTime): Int {
+    override fun destroyItem(item: AppStPersons): Int {
         return database.delete(nameTable, "id=?", arrayOf(item.id.toString()))
     }
 
@@ -119,14 +123,15 @@ class LocalBDAppStPersonsLocalTime(
         try {
             val createTableQuery = """
 CREATE TABLE IF NOT EXISTS $nameTable (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    committer TEXT NOT NULL,
-    date_write TEXT NOT NULL,
-    date TEXT NOT NULL,
-    purpose INTEGER NOT NULL  DEFAULT 0,
-    data TEXT NOT NULL,
-    comments TEXT NOT NULL,
-    c TEXT NOT NULL
+    id INTEGER UNIQUE,
+    committer TEXT,
+    date_write TEXT,
+    date TEXT,
+    purpose INTEGER,
+    data TEXT,
+    comments TEXT,
+    c TEXT,
+    sinch INTEGER
 )
 """.trimIndent()
             database.execSQL(createTableQuery)

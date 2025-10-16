@@ -1,544 +1,297 @@
 package com.example.for_chour_kotlin.presentations.fragments.attendance
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.DialogInterface
-import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CalendarView
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.for_chour_kotlin.domain.entities.infoOnePerson
-import com.example.for_chour_kotlin.domain.entities.infoOneRec
-import com.example.for_chour_kotlin.R
-import com.example.for_chour_kotlin.data.source.remote.ServerClass
-import com.example.for_chour_kotlin.data.source.remote.SendLastDate
+import com.example.for_chour_kotlin.data.typeData.appAllGroups.ViewModelAppAllGroups
 import com.example.for_chour_kotlin.data.typeData.appDataParticipant.ViewModelAppDataParticipant
-import com.example.for_chour_kotlin.domain.WriteMDB
+import com.example.for_chour_kotlin.data.typeData.appStPersons.ViewModelAppStPersons
 import com.example.for_chour_kotlin.databinding.FragmentAttendanceBinding
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+import com.example.for_chour_kotlin.presentations._interfaces.OnDataListener
+import com.example.for_chour_kotlin.R
+import com.example.for_chour_kotlin.data.source.url_responses.AccountHolder
+import com.example.for_chour_kotlin.data.typeData.appStPersons.AppStPersons
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
+import androidx.core.view.isVisible
+import androidx.core.view.isGone
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
 
 
-public class AttendanceFragment : Fragment() {
+class AttendanceFragment : Fragment(), OnDataListener {
+    private val groups: ViewModelAppAllGroups by activityViewModels()
+    private val participants: ViewModelAppDataParticipant by activityViewModels()
+    private val stPersons: ViewModelAppStPersons by activityViewModels()
+    private lateinit var binding: FragmentAttendanceBinding
+    private lateinit var calendar: CalendarView
+    private lateinit var openCalendar: ImageButton
+    private lateinit var idTextDate: TextView
+    private lateinit var spinnerPurpose: Spinner
+    private lateinit var butWrite: Button
+    private lateinit var butCreate: Button
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var textInfo: TextView
+    private var adapter: StPersonsAdapter? = null
+    private var selectedDate: String = ""
 
-    val vievModelP: ViewModelAppDataParticipant by activityViewModels()
-    private var _binding: FragmentAttendanceBinding? = null
-    var serverClass =
-        ServerClass()
-    lateinit var writeMDB: WriteMDB
-    lateinit var masSpinner: MutableList<String>
-    lateinit var masPurpose: List<String>
-    lateinit var adapterSpinner: ArrayAdapter<String>
-    lateinit var adapterPurpose: ArrayAdapter<String>
-    lateinit var personsList: List<infoOnePerson>
-    lateinit var listInfoRec: List<infoOneRec>
+    private var selectedStPersons: AppStPersons? = null
 
-    lateinit var calendarView: CalendarView
-    lateinit var butShowCalendar: ImageButton
-
-    var cursorRec: Int = -1
-    var rStart: Boolean = true;
-
-    var today: String = "2025.02.18"
-
-
-    var mAdapter: PersonsAdapter? = null
-
-    lateinit var mPersonsRec: RecyclerView
-    lateinit var butWrite: Button
-    lateinit var spinnerDate: Spinner
-    lateinit var spinnerPurpose: Spinner
-    lateinit var textInPlace: TextView
-    lateinit var editDate: EditText
-    lateinit var checkBoxActive: CheckBox
-
-    private val binding get() = _binding!!
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setHasOptionsMenu(true)
-        super.onCreate(savedInstanceState)
-        var date = Date()
-        var sdf = SimpleDateFormat("YYYY.MM.dd")
-        val dateString: String = sdf.format(date)
-        today = dateString
-        writeMDB =
-            WriteMDB(activity, context)
-        listInfoRec = writeMDB.readOneRecMas(today)
-        masSpinner = writeMDB.spinnerDay
-        personsList = writeMDB.readPersonMas()
-    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        rStart =true;
-        _binding = FragmentAttendanceBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-        //adapter = ArrayAdapter<String>(requireActivity(), R.layout.item, R.id.tvText,masPersson)
-        textInPlace = binding.textInplace
+        val nameTable = AuthorizationState.groups?.focus?.value?.listNameBases?.get("st_persons_sinch") ?:"";
+
+        binding = FragmentAttendanceBinding.inflate(inflater, container, false)
+
+        if (nameTable.isEmpty()) {
+            AuthorizationState.mainActivity?.vivod("Ошибка чтения данных"); return binding.root}
+
+        stPersons.connection(AuthorizationState.database, nameTable)
+
+
+        openCalendar = binding.idButShowCalendar
+        idTextDate = binding.idTextDate
         spinnerPurpose = binding.spinnerPurpose
-        masPurpose = listOf("Общий", "Сестринский", "Братский","Служение","Репетиция Св.","Служение Св.")
-        adapterPurpose = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masPurpose)
-        spinnerPurpose.adapter = adapterPurpose
-        spinnerPurpose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedItem = parent?.getItemAtPosition(position).toString()
-                updateUI()
-                rStart = false;
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Обработка случая, когда ничего не выбрано
-            }
-        }
-        //vivod(""+masSpinner.size)
-        mPersonsRec = binding.gvMain
-        mPersonsRec.setLayoutManager(GridLayoutManager(activity,2))
-
         butWrite = binding.butWrite
-        butWrite.setOnClickListener {
-            var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
-            if (date.equals("Сегодня")) {date = today}
+        textInfo = binding.textInplace
+        butCreate = binding.butCreate
+        recyclerView = binding.gvMain
+        calendar = binding.calendar
 
-            if (cursorRec==-1) {
-                writeMDB.writeSt(date,spinnerPurpose.selectedItemPosition ,personsList)
-            }else {
-                writeMDB.overWriteSt(date,spinnerPurpose.selectedItemPosition ,listInfoRec.get(cursorRec).getRecList())
-            }
+        installCalendar()
+        initOpenCalendar()
+        setupSpinner()  // Заполняем Spinner
 
+        // Инициализируем слушатели
+        butCreate.setOnClickListener { onCreateButtonClick() }
+        butWrite.setOnClickListener { onWriteButtonClick() }
 
-
-            if (!rStart) {
-                listInfoRec = writeMDB.readOneRecMas(today)
-                masSpinner = writeMDB.spinnerDay
-                cursorRec = 0
-                updateUI()}
-        }
-
-        spinnerDate = binding.spinnerDate
-        adapterSpinner = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masSpinner)
-        spinnerDate.adapter = adapterSpinner
-        spinnerDate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                ViborDate()
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Обработка случая, когда ничего не выбрано
-            }
-        }
-
-        editDate = binding.editDate
-        checkBoxActive = binding.checkActive
-        checkBoxActive.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                changeMasSpiner()
-                checkBoxActive.isChecked = false
-            } else {
-            }
-        }
-
-
-        calendarView = binding.calendar
-
-        butShowCalendar = binding.idButShowCalendar
-        butShowCalendar.setOnClickListener {
-            show_hide_Calendar()
-        }
-
-        show_hide_Calendar()
-
+        val root: View = binding.root
         return root
     }
 
-    private fun changeMasSpiner() {
-        val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-        try {
-            val date = LocalDate.parse(editDate.text, formatter)
-            var formattedDate = date.format(formatter)
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-            val today = LocalDate.now()
-            println("Сегодняшняя дата: $today")
-            // Сравниваем даты
-            when {date.isEqual(today) -> { formattedDate = "Сегодня" } }
-            var r: Boolean = false
-            for (i in 0..masSpinner.size-1) {
-                if (masSpinner[i].equals(formattedDate)) {
-                    spinnerDate.setSelection(i);
-                    r=true
-                    break
+        // Подписываемся на данные stPersons для проверки дат
+        stPersons.stPersons.observe(viewLifecycleOwner) { list ->
+            val dates = list?.map { it.date }?.toSet() ?: emptySet()
+            highlightDatesInCalendar(dates)  // Выделяем даты (хотя CalendarView не идеален, используем workaround)
+        }
+
+        // Устанавливаем TouchListener для закрытия календаря
+        binding.root.setOnTouchListener { v, event ->
+            if (binding.calendar.isVisible && !isPointInsideCalendar(event.x, event.y)) {
+                binding.calendar.visibility = View.GONE
+                openCalendar.setImageResource(R.drawable.img_v_calendar_visible)
+            }
+            false
+        }
+    }
+
+    private fun highlightDatesInCalendar(dates: Set<String>) {
+        calendar.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            selectedDate = "$year.${month + 1}.$dayOfMonth"
+            idTextDate.text = selectedDate
+            checkRecordsForDate(selectedDate)  // Проверяем записи для даты
+        }
+    }
+
+    private fun checkRecordsForDate(date: String) {
+        stPersons.stPersons.observe(viewLifecycleOwner) { list ->
+            val recordsForDate = list?.filter { it.date == date } ?: emptyList()
+            if (recordsForDate.isEmpty()) {
+                managerState(0)
+            } else {
+                setupCommitterList(recordsForDate)
+                val latest = recordsForDate.maxByOrNull { it.dateWrite }
+                if (latest != null) {
+                    loadRecord(latest)
                 }
             }
-            if (!r) {
-                masSpinner.add(0,formattedDate);
-                adapterSpinner = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, masSpinner)
-                spinnerDate.adapter = adapterSpinner
-            }
-        } catch (e: DateTimeParseException) {
-            vivod("Укажите правильный формат даты (пример 2025.01.01 -> год.месяц.день)")
         }
-
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    fun vivod(s: String?) {
-        Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
-    }
-    private fun updateUI() {
-        if (mAdapter == null) {
-            mAdapter = PersonsAdapter(personsList)
-            mPersonsRec.setAdapter(mAdapter)
-        } else {
-            mAdapter!!.setListPersons(personsList)
-            mAdapter!!.notifyDataSetChanged()
-            mPersonsRec.setAdapter(mAdapter)
-        }
-        if (cursorRec>=0) {butWrite.text = "Перезаписать";butWrite.setBackgroundColor(resources.getColor(R.color.pereza))}
-        else {butWrite.text = "Записать"; butWrite.setBackgroundColor(resources.getColor(R.color.purple_500))}
-        textInPlace.setText(""+counting())
-    }
-
-    private fun counting():String {
-        //все
-        var n: Int = 0
-        var nMustAll: Int = 0
-        var nAbsAll: Int = 0
-
-        //братья
-        var n_b = 0
-        var nMustAll_b = 0
-        var nAbsAll_b = 0
-
-        //сестры
-        var n_s = 0
-        var nMustAll_s = 0
-        var nAbsAll_s = 0
-
-        var purpose: Int = spinnerPurpose.selectedItemPosition
-        if (cursorRec==-1) {
-            for (infoP: infoOnePerson in personsList) {
-
-                if (infoP.state==1) {n++
-                    if (infoP.gender==2) {n_b++}
-                    else if (infoP.gender==1) {n_s++}
+    private fun setupCommitterList(records: List<AppStPersons>) {
+        val layout = binding.committersLayout
+        layout.removeAllViews()
+        records.forEach { record ->
+            val committerParticipant = participants.participants.value?.find { it.hashName == record.committer }
+            val textView = TextView(requireContext()).apply {
+                text = committerParticipant?.pName ?: record.committer
+                //setPadding(16, 8, 16, 8)
+                width = 300
+                height = 80
+                textSize = 10f
+                setBackgroundResource(R.drawable.rect1)  // Можно стилизовать
+                setOnClickListener {
+                    loadRecord(record)
                 }
-
-                if (infoP.allowed in 0..1&&(purpose==0||purpose==3&& infoP.allowed ==1|| infoP.gender ==purpose)) {
-                    nMustAll++
-                    if (infoP.gender==2) {nMustAll_b++}
-                    else if (infoP.gender==1) {nMustAll_s++}
-                }
-
-                if (infoP.gender==2) {nAbsAll_b++}
-                else if (infoP.gender==1) {nAbsAll_s++}
-                nAbsAll++
             }
+            layout.addView(textView)
         }
-        else {
-            var i=0;
-            for (infoR:String in listInfoRec.get(cursorRec).getRecList()) {
-                if (i>=personsList.size) {break}
-                val infoP: infoOnePerson = personsList.get(i)
-                if (infoR.equals("p")) {
-                    n++
-                    if (infoP.gender == 2) {
-                        n_b++;
-                    } else if (infoP.gender == 1) {
-                        n_s++;
-                    }
-                }
-
-                if (infoP.allowed in 0..1&&(purpose==0||purpose==3&& infoP.allowed ==1|| infoP.gender ==purpose)) {
-                    nMustAll++
-                    if (infoP.gender == 2) {
-                        nMustAll_b++
-                    } else if (infoP.gender == 1) {
-                        nMustAll_s++
-                    }
-                }
-
-
-                if (infoP.gender==2) {nAbsAll_b++}
-                else if (infoP.gender==1) {nAbsAll_s++}
-                nAbsAll++
-                i++
-            }
-        }
-        return "Все: "+n+"/"+nMustAll+" ["+nAbsAll+"]  "+"Б: "+n_b+"/"+nMustAll_b+" ["+nAbsAll_b+"]  "+"С: "+n_s+"/"+nMustAll_s+" ["+nAbsAll_s+"] "
     }
 
-    //метод для показа и скрывания календаря
-    fun show_hide_Calendar() {
-        if (calendarView.visibility == View.VISIBLE) {
-            calendarView.visibility = View.GONE
-            butShowCalendar.setImageResource(R.drawable.img_v_calendar_visible)
-        }
-        else {
-            calendarView.visibility = View.VISIBLE
-            butShowCalendar.setImageResource(R.drawable.img_v_calendar_hide)
-        }
-
-        vivod(""+calendarView.visibility)
-    }
-
-    fun ViborDate() {
-        var date: String = masSpinner.get(spinnerDate.selectedItemPosition)
-        if (date.equals("Сегодня")) {date=today;}
-        cursorRec = -1
-        for (i in 0..listInfoRec.size-1) {
-            if (date.equals(listInfoRec.get(i).getRecDate())) {
-                cursorRec = i;
-                break
-            }
-        }
-        if (cursorRec >=0) {spinnerPurpose.isEnabled = false;
-            spinnerPurpose.setSelection(listInfoRec.get(cursorRec).purpose)
-        }
-        else {spinnerPurpose.isEnabled = true;
-            spinnerPurpose.setSelection(0)
-        }
-        if (!rStart) {updateUI();}
-    }
-
-    fun vivodMes(s: String) {
-        // построение диалогового окна
-        val dialogBuilder = AlertDialog.Builder(activity)
-        // установка сообщения диалогового окна
-        dialogBuilder.setMessage(s)
-            // отмена возможности отмены диалога
-            .setCancelable(false)
-            // текст и действие для положительной кнопки
-            .setPositiveButton("Proceed", DialogInterface.OnClickListener { dialog, id ->  })
-            // текст и действие для отрицательной кнопки
-            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, id ->  })
-        // создание диалогового окна
-        val alert = dialogBuilder.create()
-        // установка заголовка для диалогового окна
-        alert.setTitle("AlertDialogExample")
-        // вывод диалогового окна
-        alert.show()
-    }
-    inner class PersonHolder:
-        ViewHolder,
-        View.OnClickListener {
-        var mPerson: infoOnePerson? = null
-        var selectLayout: LinearLayout? = null
-        var name: TextView? = null
-        constructor(inflater: LayoutInflater, parent: ViewGroup?) : super(inflater.inflate(R.layout.item, parent, false)) {
-            itemView.setOnClickListener(this)
-            selectLayout =itemView.findViewById(R.id.styleLayout)
-            name = itemView.findViewById(R.id.tvText)
-        }
-
-        fun bind(sperson: infoOnePerson?) {
-            mPerson = sperson
-            name?.text = mPerson?.name
-            if (cursorRec==-1) {
-                var purpose: Int = spinnerPurpose.selectedItemPosition
-            if (mPerson?.state ==0?: true) {
-                if (mPerson?.allowed in 0..1&&(purpose==0||purpose==4||purpose==5||purpose==3&&mPerson?.allowed==1||mPerson?.gender==purpose)) { selectLayout?.setBackgroundResource(R.drawable.rect1)}
-                else {selectLayout?.setBackgroundResource(R.drawable.rect_gone)}
+    private fun loadRecord(record: AppStPersons) {
+        adapter = StPersonsAdapter(participants.participants.value ?: listOf(), spinnerPurpose.selectedItemId.toInt(), null, this)
+        selectedStPersons = record
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        if (record.sinch == 0) {
+            if (adapter?.initAppStPersons() == false) {
+                managerState(1)
             }
             else {
-                selectLayout?.setBackgroundResource(R.drawable.rect2)
+                managerState(2)
             }
-            } else {
-                var infoCs: List<String> = listInfoRec.get(cursorRec).getRecList()
-                var id: Int = mPerson?.id ?: 1
-                id--
-                if (infoCs.get(id).equals("p")) {
-                    selectLayout?.setBackgroundResource(R.drawable.rect2)
-                }else if (infoCs.get(id).equals("n")) {
-                    selectLayout?.setBackgroundResource(R.drawable.rect_not)
-                }
-                else  {
-                    selectLayout?.setBackgroundResource(R.drawable.rect_gone)
-                }
-            }
-        }
-
-        @SuppressLint("SuspiciousIndentation", "SetTextI18n")
-        override fun onClick(view: View) {
-            if (cursorRec == -1) {
-                val purpose: Int = spinnerPurpose.selectedItemPosition
-                if (mPerson?.state == 0) {
-                    mPerson?.state = 1
-                    selectLayout?.setBackgroundResource(R.drawable.rect2)
-                } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 ||purpose == 4 ||purpose == 5  ||(purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
-                    selectLayout?.setBackgroundResource(R.drawable.rect_gone)
-                    mPerson?.state = 0
-                } else {
-                    mPerson?.state = 0
-                    selectLayout?.setBackgroundResource(R.drawable.rect1)
-                }
-            } else {
-                val purpose: Int = spinnerPurpose.selectedItemPosition
-                val listNow: MutableList<String> = listInfoRec[cursorRec].getRecList()
-                var id: Int = (mPerson?.id ?: 1) - 1
-
-                try {
-                    if (listNow[id].isNotEmpty() && listNow[id] != "p") {
-                        listNow[id] = "p"
-                        selectLayout?.setBackgroundResource(R.drawable.rect2)
-                    } else if (!(mPerson?.allowed in 0..1 && (purpose == 0 || (purpose == 3 && mPerson?.allowed == 1) || mPerson?.gender == purpose))) {
-                        selectLayout?.setBackgroundResource(R.drawable.rect_gone)
-                        listNow[id] = "d"
-                    } else {
-                        listNow[id] = "n"
-                        selectLayout?.setBackgroundResource(R.drawable.rect_not)
-                    }
-                } catch (_: Exception) {}
-            }
-            textInPlace.text = counting()
+        } else {
+            managerState(1)
         }
     }
 
-    inner class PersonsAdapter(listPersons: List<infoOnePerson>) :
-        RecyclerView.Adapter<PersonHolder>() {
-        private var mListPersons: List<infoOnePerson>
-        init {
-            mListPersons = listPersons
-        }
-
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            i: Int
-        ): PersonHolder {
-            val layoutInflater = LayoutInflater.from(activity)
-            return PersonHolder(
-                layoutInflater,
-                parent
-            )
-        }
-
-        override fun onBindViewHolder(
-            holder: PersonHolder,
-            position: Int
-        ) {
-           //val infoOnePerson1: infoOnePerson = mListPersons[position]
-                holder.bind(mListPersons[position])
-        }
-
-        override fun getItemCount(): Int {
-            return mListPersons.size
-        }
-
-        fun setListPersons(spersons: List<infoOnePerson>) {
-            mListPersons = spersons
+    private fun onCreateButtonClick() {
+        val committer = AccountHolder.hashName
+        adapter = StPersonsAdapter(participants.participants.value ?: listOf(), spinnerPurpose.selectedItemId.toInt(), null, this)
+        recyclerView.adapter = adapter
+        val newRecord = adapter?.createAppStPersons(committer, selectedDate)
+        if (newRecord != null) {
+            stPersons.addItem(newRecord)
+            loadRecord(newRecord)
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_attendance, menu);
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.toSet -> {
-                writeMDB.toSet();
-                return true;
-            }
-            R.id.toSetOne -> {
-                if (cursorRec>=0) {
-                    val sel: Int = spinnerDate.selectedItemPosition
-                    val day: String = masSpinner[sel]
-                    writeMDB.toSetOneDay(day);
-                    return true;
+    private fun onWriteButtonClick() {
+
+        if (adapter != null) {
+            if (adapter!!.initAppStPersons()) {
+                val appStPersons = adapter!!.getAppStPersons()
+                if (appStPersons != null && stPersons.updateItem(appStPersons)>=1) {
+                    adapter!!.update()
                 }
                 else {
-                    vivod("Выберите сохраненную запись")
+                    AuthorizationState.mainActivity?.vivod("Ошибка сохранения")
                 }
-                return true;
             }
-            R.id.toSetLast -> {
-                val sendObject: SendLastDate = SendLastDate()
-                sendObject.startSend(requireActivity(),requireContext())
-                return true;
+            else {
+                AuthorizationState.mainActivity?.vivodMes(AccountHolder.hashName)
+                val appStPersons = adapter!!.createAppStPersons(AccountHolder.hashName,
+                    idTextDate.text as String
+                )
+                if (appStPersons!=null && stPersons.addItem(appStPersons)>=1) {
+                    adapter!!.update()
+                }
+                else {
+                    AuthorizationState.mainActivity?.vivod("Ошибка сохранения")
+                }
             }
-            R.id.MyDelo -> {
-                writeMDB.muDelo();
-                return true;
+            managerState(2)
+        }
+    }
+
+    private fun setupSpinner() {
+        groups.focus.observe(viewLifecycleOwner) { focus ->
+            val purposes = focus?.data?.find { it.type == "purposes" }?.data
+            val adapterSpinner = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                purposes?.map { it.name } ?: listOf()
+            )
+            adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerPurpose.adapter = adapterSpinner
+
+            spinnerPurpose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                    val selectedPurposeId = purposes?.get(position)?.id?.toIntOrNull() ?: 0
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    // Handle nothing selected
+                }
             }
-            R.id.Update -> {
-                vivodMes(writeMDB.Update());
-                return true;
+        }
+    }
+
+    private fun initOpenCalendar() {
+        calendar.visibility = View.GONE
+        openCalendar.setOnClickListener {
+            if (calendar.isGone) {
+                binding.calendar.visibility = View.VISIBLE
+                openCalendar.setImageResource(R.drawable.img_v_calendar_hide)
+            } else {
+                calendar.visibility = View.GONE
+                openCalendar.setImageResource(R.drawable.img_v_calendar_visible)
             }
-            R.id.Del-> {
-                if (cursorRec>=0) {
-                    var sel: Int = spinnerDate.selectedItemPosition
-                    var day: String = masSpinner[sel]
-                    val dialogBuilder = AlertDialog.Builder(activity)
-                    dialogBuilder.setTitle("Удаление записи")
-                        .setMessage("Будет удалена запись за " + day + " число, вы уверены?")
-                        .setCancelable(false)
-                        .setPositiveButton(
-                            "Удалить",
-                            DialogInterface.OnClickListener { dialog, id ->
-                                if (day.equals("Сегодня")) {
-                                    day = today
-                                }
-                                writeMDB.Del(day);
-                                listInfoRec = writeMDB.readOneRecMas(today)
-                                masSpinner = writeMDB.spinnerDay
-                                personsList = writeMDB.readPersonMas()
-                                adapterSpinner = ArrayAdapter<String>(
-                                    requireActivity(),
-                                    android.R.layout.simple_list_item_1,
-                                    masSpinner
-                                )
-                                spinnerDate.adapter = adapterSpinner
-                                if (sel == masSpinner.size) {
-                                    sel--;
-                                }
-                                spinnerDate.setSelection(sel)
-                                //ViborDate()
-                                updateUI()
-                            })
-                        .setNegativeButton(
-                            "Отмена",
-                            DialogInterface.OnClickListener { dialog, id -> })
-                    val alert = dialogBuilder.create()
-                    alert.setTitle("AlertDialogExample")
-                    alert.show()
-                }else {vivodMes("На Сегодня запись отсутствует")}
-                return true;
+        }
+    }
+
+    private fun installCalendar() {
+        val today = System.currentTimeMillis()
+        calendar.date = today
+        selectedDate = formatDate(today)  // Инициализируем выбранную дату
+        idTextDate.text = selectedDate
+    }
+
+    private fun formatDate(timestamp: Long): String {
+        val sdf = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+        return sdf.format(Date(timestamp))
+    }
+
+    private fun isPointInsideCalendar(x: Float, y: Float): Boolean {
+        val calendarLocation = IntArray(2)
+        binding.calendar.getLocationOnScreen(calendarLocation)
+        val calendarX = calendarLocation[0]
+        val calendarY = calendarLocation[1]
+        val width = binding.calendar.width
+        val height = binding.calendar.height
+        return x >= calendarX && x <= calendarX + width && y >= calendarY && y <= calendarY + height
+    }
+
+    override fun onDataUpdate(counts: Triple<Int, Int, Int>) {
+    }
+
+
+    private fun managerState(state: Int) {
+        //0 - нет записи; 1 - запись создана, но не записана в базу; 2 - Запись добавлена
+        when (state) {
+            0 -> {
+                butCreate.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+                butWrite.isEnabled = false
+                spinnerPurpose.isEnabled = false
             }
 
-            else -> return super.onOptionsItemSelected(item)
+            1 -> {
+                butCreate.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                butWrite.isEnabled = true
+                butWrite.text = "Записать"
+                spinnerPurpose.isEnabled = true
+            }
+
+            2 -> {
+                butCreate.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                butWrite.isEnabled = true
+                butWrite.text = "Перезаписать"
+                spinnerPurpose.isEnabled = true
+            }
         }
-    }
-    fun joinTo(l: List<String>): String {
-        var str: String=""
-        for (i in 0..l.size-1) {
-        }
-        return str
-    }
-    override fun onStart() {
-        super.onStart()
-        if (!rStart) {updateUI()}
     }
 }

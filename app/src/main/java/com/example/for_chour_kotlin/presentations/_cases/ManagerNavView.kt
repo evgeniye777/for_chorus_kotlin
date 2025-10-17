@@ -19,6 +19,7 @@ import com.example.for_chour_kotlin.presentations.adapters.GroupNameAdapter
 import com.example.for_chour_kotlin.presentations.dialogs.DialogFragmentIn
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
+import com.google.gson.Gson
 
 class ManagerNavView(val binding: ActivityMainBinding,val context: Context,val lifecycleOwner: LifecycleOwner) {
     private lateinit var navView: NavigationView
@@ -58,6 +59,17 @@ class ManagerNavView(val binding: ActivityMainBinding,val context: Context,val l
                     {
                         loginLabel.text = AccountHolder.login
                         AuthorizationState.groups?.connection(AuthorizationState.database,"app_all_groups")
+                        val groupsList = AuthorizationState.groups?.groups?.value
+                        if (groupsList!=null&& groupsList.isNotEmpty()) {
+                            val versions: String = {
+                                val map = groupsList.associate { it.hashName to it.version }
+                                Gson().toJson(map)
+                            }()
+                            AuthorizationState.typeResponses?.uploadingUpdatesGroups(versions,{},{})
+                        }
+                        else {
+                            AuthorizationState.typeResponses?.uploadingGroupData({},{})
+                        }
                         },
                     {})
             }

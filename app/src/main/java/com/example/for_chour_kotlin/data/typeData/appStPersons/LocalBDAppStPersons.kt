@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
 import com.example.for_chour_kotlin.data.typeData._cases.JsonWork
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
 
@@ -22,7 +23,10 @@ class LocalBDAppStPersons(
         if (!isTableExists(nameTable)) {
             createTable(nameTable)
         }
-        val cursor: Cursor = database.rawQuery("SELECT * FROM $nameTable", null)
+        val cursor: Cursor = database.rawQuery(
+            "SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY date ORDER BY date_write DESC, id DESC) AS rn FROM $nameTable) WHERE rn = 1",
+            null
+        )
         val appstpersonssinches = mutableListOf<AppStPersons>()
 
         if (cursor.moveToFirst()) {
@@ -55,9 +59,22 @@ class LocalBDAppStPersons(
         return appstpersonssinches
     }
 
+    private fun existsById(id: Int): Boolean {
+        if (id < 0) return false
+        val query = "SELECT id FROM $nameTable WHERE id = ? LIMIT 1"
+        val cursor = database.rawQuery(query, arrayOf(id.toString()))
+        return try {
+            cursor.moveToFirst()
+        } finally {
+            cursor.close()
+        }
+    }
+
     // Добавление данных в таблицу
     override fun addItem(item: AppStPersons): Int {
+        if (existsById(item.id)) {return updateItem(item);}
         val values = ContentValues().apply {
+            put("id", item.id)
             put("committer", item.committer)
             put("date_write", item.dateWrite)
             put("date", item.date)
@@ -67,7 +84,7 @@ class LocalBDAppStPersons(
             put("c", jsW.listToJsonH(item.c))
             put("sinch", item.sinch)
         }
-        return database.insert(nameTable, null, values).toInt() // Возвращаем новый ID
+        return database.insert(nameTable, null, values).toInt()
     }
 
     // Обновление данных в таблице
@@ -84,7 +101,7 @@ class LocalBDAppStPersons(
         }
         return database.update(
             nameTable, values, "id=?", arrayOf(item.id.toString())
-        ) // Обновляем запись по ID
+        )
     }
 
     // Возобновляемое удаление из таблицы

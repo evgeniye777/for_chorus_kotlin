@@ -71,6 +71,7 @@ class LocalBDAppDataParticipant(
     override fun addItem(item: AppDataParticipant): Int {
         if (existsById(item.id)) {return updateItem(item);}
         val values = ContentValues().apply {
+            put("id", item.id)
             put("id_c", item.idC)
             put("version", item.version)
             put("hash_name", item.hashName)

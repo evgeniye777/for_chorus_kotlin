@@ -52,6 +52,7 @@ class GroupNameAdapter(
     private fun onclickGroup(group : AppAllGroups) {
         val partisipantName = group.listNameBases.get("participant");
         if (partisipantName?.isNotEmpty() ?: false) {
+
             AuthorizationState.participants?.connection(AuthorizationState.database,partisipantName)
 
             val participants = AuthorizationState.participants?.participants?.value
@@ -60,17 +61,15 @@ class GroupNameAdapter(
                 val versions: String = participants.joinToString(separator = ",") { "${it.id}:${it.version}" }
 
                 AuthorizationState.typeResponses?.uploadingUpdatesParticipants(group.hashName,versions,{
-                    AuthorizationState.mainActivity?.vivodMes(AuthorizationState.dataAuthorization)
-                },{
-                    AuthorizationState.mainActivity?.vivodMes(AuthorizationState.dataAuthorization)
-                })
+                    //Вторичный конект
+                    AuthorizationState.participants?.connection(AuthorizationState.database,partisipantName)
+                },{})
             }
             else {
                 AuthorizationState.typeResponses?.uploadingParticipantsData(group.hashName,{
-                    AuthorizationState.mainActivity?.vivodMes(AuthorizationState.dataAuthorization)
-                },{
-                    AuthorizationState.mainActivity?.vivodMes(AuthorizationState.dataAuthorization)
-                })
+                    //Вторичный конект
+                    AuthorizationState.participants?.connection(AuthorizationState.database,partisipantName)
+                },{})
             }
 
         }

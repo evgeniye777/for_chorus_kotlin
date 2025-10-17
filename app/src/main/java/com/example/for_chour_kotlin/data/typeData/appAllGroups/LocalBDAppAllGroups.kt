@@ -16,7 +16,7 @@ class LocalBDAppAllGroups(
     val jsW: JsonWork = JsonWork()
 
     // Локальная выгрузка всех данных
-    @SuppressLint("Range")
+    @SuppressLint("Range", "SuspiciousIndentation")
     override fun readItems(nameTable: String): MutableList<AppAllGroups> {
         this.nameTable = nameTable
 
@@ -77,6 +77,7 @@ class LocalBDAppAllGroups(
     override fun addItem(item: AppAllGroups): Int {
         if (existsById(item.id)) {return updateItem(item);}
         val values = ContentValues().apply {
+            put("id", item.id)
             put("version", item.version)
             put("hash_name", item.hashName)
             put("name", item.name)
@@ -88,13 +89,12 @@ class LocalBDAppAllGroups(
             put("n_notification", item.nNotification)
             put("visible", item.visible)
         }
-        return database.insert(nameTable, null, values).toInt() // Возвращаем новый ID
+        return database.insert(nameTable, null, values).toInt()
     }
 
     // Обновление данных в таблице
     override fun updateItem(item: AppAllGroups): Int {
         val values = ContentValues().apply {
-            put("version", item.version)
             put("hash_name", item.hashName)
             put("name", item.name)
             put("date", item.date_create)
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS $nameTable (
     id INTEGER UNIQUE,
     version INTEGER,
     hash_name TEXT UNIQUE,
-    name TEXT UNIQUE,
+    name TEXT,
     date TEXT,
     location TEXT,
     creator TEXT,

@@ -16,7 +16,7 @@ class RepositoryAppStPersons(private var _groups: MutableLiveData<List<AppStPers
         var newId: Int = -1
         val currentList = _groups.value ?: emptyList()
         newId = currentList.size + 1
-        _groups.value = currentList + item
+        _groups.postValue(currentList + item)
         return newId
     }
 

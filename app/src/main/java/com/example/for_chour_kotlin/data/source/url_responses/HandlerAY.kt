@@ -7,6 +7,7 @@ import android.util.Log
 import com.example.for_chour_kotlin.data.source.url_responses.handlers.AccountResponseHandler
 import com.example.for_chour_kotlin.data.source.url_responses.handlers.GroupResponseHandler
 import com.example.for_chour_kotlin.data.source.url_responses.handlers.ParticipantsResponseHandler
+import com.example.for_chour_kotlin.data.source.url_responses.handlers.StPersonsResponseHandler
 
 class HandlerAY(val localDataAY: LocalDataAY?) {
 
@@ -24,6 +25,7 @@ class HandlerAY(val localDataAY: LocalDataAY?) {
             val accountHandler = AccountResponseHandler(localDataAY)
             val groupHandler = GroupResponseHandler()
             val participantHandler = ParticipantsResponseHandler()
+            val stPersonsHandler = StPersonsResponseHandler()
 
             var allSuccess = true // Флаг для проверки, что все части обработаны успешно
             for (i in 0 until jsonArray.length()) {
@@ -58,6 +60,17 @@ class HandlerAY(val localDataAY: LocalDataAY?) {
                     }
                     "uploadingUpdatesParticipants" -> {
                         if (!participantHandler.handle(jsonObject)) {
+                            allSuccess = false
+                        }
+                    }
+                    "uploadingStPersonsSinch" -> {
+                        if (!stPersonsHandler.handle(jsonObject)) {
+                            allSuccess = false
+                        }
+
+                    }
+                    "uploadingUpdatesStPersonsSinch" -> {
+                        if (!stPersonsHandler.handle(jsonObject)) {
                             allSuccess = false
                         }
                     }

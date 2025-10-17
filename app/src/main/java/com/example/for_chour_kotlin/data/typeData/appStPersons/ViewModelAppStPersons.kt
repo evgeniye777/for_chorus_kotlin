@@ -4,7 +4,9 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
+import com.example.for_chour_kotlin.data.typeData.appDataParticipant.AppDataParticipant
 
 class ViewModelAppStPersons() : ViewModel(), DataOperations<AppStPersons> {
 
@@ -37,6 +39,7 @@ class ViewModelAppStPersons() : ViewModel(), DataOperations<AppStPersons> {
         val newId: Int = localbdAppStPersons?.addItem(item) ?: -1
         if (newId >= 0) {
             repositoryAppStPersons?.addItem(item.copy(id = newId))
+            AuthorizationState.dataAuthorization+=""+newId+"; "
         }
         return newId
     }
@@ -48,6 +51,15 @@ class ViewModelAppStPersons() : ViewModel(), DataOperations<AppStPersons> {
             repositoryAppStPersons?.updateItem(item)
         }
         return n
+    }
+    override fun addOrUpdateItem(item: AppStPersons): Int {
+        val currentList = _groups.value ?: emptyList()
+        val existingItem = currentList.find { it.id == item.id }
+        return if (existingItem != null) {
+            updateItem(item)
+        } else {
+            addItem(item)
+        }
     }
 
     // Метод для неполного удаления данных из таблиц

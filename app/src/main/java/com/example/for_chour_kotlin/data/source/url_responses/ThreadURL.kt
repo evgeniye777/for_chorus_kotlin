@@ -28,7 +28,7 @@ class ThreadURL {
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         val response = inputStream.bufferedReader().use { it.readText() }
                         val handlerAY = HandlerAY(localDataAY)
-                        //AuthorizationState.dataAuthorization += response
+                        AuthorizationState.mainActivity?.vivodMes(response)
                         handlerAY.handleServerResponse(response, onSuccess, onFailure)
                     } else {
                         runOnUiThread { onFailure() }

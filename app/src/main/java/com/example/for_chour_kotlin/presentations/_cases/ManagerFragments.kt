@@ -13,7 +13,6 @@ import com.example.for_chour_kotlin.databinding.MenuItemBottomBinding
 import com.example.for_chour_kotlin.presentations.fragments.attendance.AttendanceFragment
 import com.example.for_chour_kotlin.presentations.fragments.group_details.GroupDetailsFragment
 import com.example.for_chour_kotlin.presentations.fragments.web_fragments.WebViewFragment
-import com.google.android.material.navigation.NavigationView
 
 class ManagerFragments(val binding: ActivityMainBinding,val context: Context) {
     private lateinit var menuBottomContent: Array<MenuItemBottomBinding>

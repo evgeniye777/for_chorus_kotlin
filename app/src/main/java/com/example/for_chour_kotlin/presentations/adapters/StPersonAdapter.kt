@@ -77,6 +77,7 @@ class StPersonsAdapter(
             participant.idC to makeStatus.getDataFromAdapter(participant, purpose, statusMap[participant.idC] ?: false)
         }
         appStPersons = AppStPersons(
+            id = -1,
             committer = committer,
             date = date, dateWrite = "", purpose = purpose, c = HashMap(newData))
         this.appStPersons = appStPersons

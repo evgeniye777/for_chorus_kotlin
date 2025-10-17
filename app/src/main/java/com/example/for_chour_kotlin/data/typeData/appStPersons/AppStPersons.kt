@@ -1,7 +1,7 @@
 package com.example.for_chour_kotlin.data.typeData.appStPersons
 
 data class AppStPersons(
-    var id: Int? = null,
+    var id: Int,
     var committer: String?,
     var dateWrite: String,
     var date: String,

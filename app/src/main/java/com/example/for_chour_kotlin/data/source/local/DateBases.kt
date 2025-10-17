@@ -15,7 +15,7 @@ class DataBases(private val mContext: Context) : SQLiteOpenHelper(mContext, DB_N
     companion object {
         private const val DB_NAME = "person.db"
         private var DB_PATH = ""
-        private const val DB_VERSION = 25
+        private const val DB_VERSION = 27
     }
 
     private var mDataBase: SQLiteDatabase? = null

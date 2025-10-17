@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase
 import com.example.for_chour_kotlin.data.typeData._cases.JsonWork
 import com.example.for_chour_kotlin.data.typeData.appAllGroups.ViewModelAppAllGroups
 import com.example.for_chour_kotlin.data.typeData.appDataParticipant.ViewModelAppDataParticipant
+import com.example.for_chour_kotlin.data.typeData.appStPersons.ViewModelAppStPersons
 import com.example.for_chour_kotlin.presentations.activities.MainActivity
 
 data class AccountData(
@@ -88,6 +89,7 @@ object AuthorizationState {
 
     var groups: ViewModelAppAllGroups? = null
     var participants: ViewModelAppDataParticipant? = null
+    var stPersons: ViewModelAppStPersons? = null
     fun clean() {
         lastErrorMessage = null
         dataAuthorization = null

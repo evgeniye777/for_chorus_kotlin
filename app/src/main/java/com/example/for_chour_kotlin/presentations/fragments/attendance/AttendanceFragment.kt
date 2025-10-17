@@ -64,6 +64,32 @@ class AttendanceFragment : Fragment(), OnDataListener {
 
         stPersons.connection(AuthorizationState.database, nameTable)
 
+        AuthorizationState.stPersons = stPersons
+
+        val group = groups.focus.value?.hashName
+
+
+
+        if (stPersons.stPersons.value?.isNotEmpty() ?: false) {
+
+            val last_index: String? = stPersons.stPersons.value?.lastOrNull()?.id?.toString()
+
+            if (group!=null&& last_index!=null) {
+                AuthorizationState.typeResponses?.uploadingUpdatesStPersonsSinch(group,last_index, {
+                    //Вторичный конект
+                    stPersons.connection(AuthorizationState.database, nameTable)
+                    AuthorizationState.mainActivity?.vivodMes(AuthorizationState.dataAuthorization) }, {})
+            }
+        }
+        else {
+            if (group!=null) {
+                AuthorizationState.typeResponses?.uploadingStPersonsSinch(group, {
+                    //Вторичный конект
+                    stPersons.connection(AuthorizationState.database, nameTable)
+                    AuthorizationState.mainActivity?.vivodMes(AuthorizationState.dataAuthorization)}, {})
+            }
+        }
+
 
         openCalendar = binding.idButShowCalendar
         idTextDate = binding.idTextDate
@@ -76,7 +102,7 @@ class AttendanceFragment : Fragment(), OnDataListener {
 
         installCalendar()
         initOpenCalendar()
-        setupSpinner()  // Заполняем Spinner
+        setupSpinner()
 
         // Инициализируем слушатели
         butCreate.setOnClickListener { onCreateButtonClick() }
@@ -106,30 +132,29 @@ class AttendanceFragment : Fragment(), OnDataListener {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private fun highlightDatesInCalendar(dates: Set<String>) {
         calendar.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            selectedDate = "$year.${month + 1}.$dayOfMonth"
+            selectedDate = String.format("%04d.%02d.%02d", year, month + 1, dayOfMonth)
             idTextDate.text = selectedDate
-            checkRecordsForDate(selectedDate)  // Проверяем записи для даты
+            AuthorizationState.mainActivity?.vivodMes(""+stPersons.stPersons.value?.size)
+            checkRecordsForDate(selectedDate)
+
         }
     }
 
     private fun checkRecordsForDate(date: String) {
         stPersons.stPersons.observe(viewLifecycleOwner) { list ->
-            val recordsForDate = list?.filter { it.date == date } ?: emptyList()
-            if (recordsForDate.isEmpty()) {
+            val recordsForDate = list?.firstOrNull { it.date==date}
+            if (recordsForDate == null) {
                 managerState(0)
             } else {
-                setupCommitterList(recordsForDate)
-                val latest = recordsForDate.maxByOrNull { it.dateWrite }
-                if (latest != null) {
-                    loadRecord(latest)
-                }
+                loadRecord(recordsForDate)
             }
         }
     }
 
-    private fun setupCommitterList(records: List<AppStPersons>) {
+    /*private fun setupCommitterList(records: List<AppStPersons>) {
         val layout = binding.committersLayout
         layout.removeAllViews()
         records.forEach { record ->
@@ -147,22 +172,22 @@ class AttendanceFragment : Fragment(), OnDataListener {
             }
             layout.addView(textView)
         }
-    }
+    }*/
 
     private fun loadRecord(record: AppStPersons) {
-        adapter = StPersonsAdapter(participants.participants.value ?: listOf(), spinnerPurpose.selectedItemId.toInt(), null, this)
+        adapter = StPersonsAdapter(participants.participants.value ?: listOf(), spinnerPurpose.selectedItemId.toInt(), record, this)
         selectedStPersons = record
         recyclerView.adapter = adapter
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+
+        AuthorizationState.mainActivity?.vivodMes(" "+participants.participants.value?.size+"   "+record.toString())
+
         if (record.sinch == 0) {
-            if (adapter?.initAppStPersons() == false) {
-                managerState(1)
-            }
-            else {
-                managerState(2)
-            }
-        } else {
             managerState(1)
+        } else if (record.sinch==1) {
+            managerState(2)
+        } else if (record.sinch==2) {
+            managerState(3)
         }
     }
 
@@ -172,6 +197,7 @@ class AttendanceFragment : Fragment(), OnDataListener {
         recyclerView.adapter = adapter
         val newRecord = adapter?.createAppStPersons(committer, selectedDate)
         if (newRecord != null) {
+            newRecord.sinch = 0
             stPersons.addItem(newRecord)
             loadRecord(newRecord)
         }
@@ -182,7 +208,8 @@ class AttendanceFragment : Fragment(), OnDataListener {
         if (adapter != null) {
             if (adapter!!.initAppStPersons()) {
                 val appStPersons = adapter!!.getAppStPersons()
-                if (appStPersons != null && stPersons.updateItem(appStPersons)>=1) {
+                appStPersons?.sinch = 1
+                if (appStPersons != null && stPersons.updateItem(appStPersons) >=1) {
                     adapter!!.update()
                 }
                 else {
@@ -190,11 +217,11 @@ class AttendanceFragment : Fragment(), OnDataListener {
                 }
             }
             else {
-                AuthorizationState.mainActivity?.vivodMes(AccountHolder.hashName)
                 val appStPersons = adapter!!.createAppStPersons(AccountHolder.hashName,
                     idTextDate.text as String
                 )
-                if (appStPersons!=null && stPersons.addItem(appStPersons)>=1) {
+                appStPersons?.sinch = 1
+                if (appStPersons!=null && stPersons.addItem(appStPersons) >=1) {
                     adapter!!.update()
                 }
                 else {
@@ -215,6 +242,8 @@ class AttendanceFragment : Fragment(), OnDataListener {
             )
             adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerPurpose.adapter = adapterSpinner
+
+            spinnerPurpose.setSelection(selectedStPersons?.purpose?: 0)
 
             spinnerPurpose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -291,6 +320,13 @@ class AttendanceFragment : Fragment(), OnDataListener {
                 butWrite.isEnabled = true
                 butWrite.text = "Перезаписать"
                 spinnerPurpose.isEnabled = true
+            }
+            3 -> {
+                butCreate.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                butWrite.isEnabled = false
+                butWrite.text = "Записать"
+                spinnerPurpose.isEnabled = false
             }
         }
     }

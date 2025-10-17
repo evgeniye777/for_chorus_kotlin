@@ -34,18 +34,36 @@ class GroupResponseHandler(
                 for (i in 0 until dataArray.length()) {
                     val groupJson = dataArray.getJSONObject(i)
                     try {
-                        val parsedGroup = parseGroupFromJson(groupJson)
-                        val result = groupsViewModel?.addOrUpdateItem(parsedGroup)
-                        if (result != null) {
-                            if (result < 0) {
-                                Log.e("GroupHandler", "Failed to add/update group with id=${parsedGroup.id}, hashName=${parsedGroup.hashName}")
-                                allProcessedSuccessfully = false
+                        val actions = groupJson.optString("actions", "")  // Получаем значение "actions", по умолчанию пустая строка
+
+                        if (actions == "delete") {
+                            // Обработка случая удаления
+                            val hashName = groupJson.optString("hash_name")
+                            if (hashName.isNotEmpty()) {
+                                //deleteGroupByHashName(hashName)  // Вызываем метод удаления
+                                Log.d("GroupHandler", "Successfully processed delete for hashName=$hashName")
                             } else {
-                                Log.d("GroupHandler", "Successfully added/updated group with id=${parsedGroup.id}, hashName=${parsedGroup.hashName}")
+                                Log.e("GroupHandler", "Hash name is missing for delete action at index $i")
+                                allProcessedSuccessfully = false
+                            }
+                        } else {
+                            // Обычная обработка: парсинг и добавление/обновление
+                            val parsedGroup = parseGroupFromJson(groupJson)
+                            val result = groupsViewModel?.addOrUpdateItem(parsedGroup)
+                            if (result != null) {
+                                if (result < 0) {
+                                    Log.e("GroupHandler", "Failed to add/update group with id=${parsedGroup.id}, hashName=${parsedGroup.hashName}")
+                                    allProcessedSuccessfully = false
+                                } else {
+                                    Log.d("GroupHandler", "Successfully added/updated group with id=${parsedGroup.id}, hashName=${parsedGroup.hashName}")
+                                }
+                            } else {
+                                Log.e("GroupHandler", "groupsViewModel.addOrUpdateItem returned null at index $i")
+                                allProcessedSuccessfully = false
                             }
                         }
                     } catch (e: Exception) {
-                        Log.e("GroupHandler", "Error parsing group at index $i: ${e.message}", e)
+                        Log.e("GroupHandler", "Error processing group at index $i: ${e.message}", e)
                         allProcessedSuccessfully = false
                     }
                 }

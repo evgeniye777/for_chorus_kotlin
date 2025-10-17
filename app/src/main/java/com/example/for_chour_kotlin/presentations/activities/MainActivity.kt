@@ -2,6 +2,10 @@ package com.example.for_chour_kotlin.presentations.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,9 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     private val groups: ViewModelAppAllGroups by viewModels()
     private val participant: ViewModelAppDataParticipant by viewModels()
-
-    private val stPersons: ViewModelAppStPersons by viewModels()
-
     private lateinit var binding: ActivityMainBinding
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -51,9 +52,12 @@ class MainActivity : AppCompatActivity() {
         val typeResponses = TypeResponses()
         AuthorizationState.typeResponses = typeResponses
 
+        groups.connection(AuthorizationState.database, "app_all_groups")
+        AuthorizationState.groups = groups;
+        AuthorizationState.participants = participant;
+
         typeResponses.checkAuthorization(
             onSuccess = {
-                vivodMes(AuthorizationState.dataAuthorization)
                 val groupsList = groups.groups.value;
                 if (groupsList!=null&& groupsList.isNotEmpty()) {
                     val versions: String = {
@@ -63,21 +67,14 @@ class MainActivity : AppCompatActivity() {
                     AuthorizationState.typeResponses?.uploadingUpdatesGroups(versions,{},{})
                 }
                 else {
-                    AuthorizationState.typeResponses?.uploadingGroupData({vivodMes(AuthorizationState.dataAuthorization)},{vivodMes(AuthorizationState.dataAuthorization)})
+                    AuthorizationState.typeResponses?.uploadingGroupData({},{})
                 }
             },
             onFailure = {
-                vivodMes(AuthorizationState.dataAuthorization)
             }
         )
 
-        //Проверка актуальности логина и пароля
-        //если всё ок
 
-        groups.connection(AuthorizationState.database, "app_all_groups")
-
-        AuthorizationState.groups = groups;
-        AuthorizationState.participants = participant;
 
         ManagerNavView(binding, this,this)
 
@@ -89,13 +86,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun vivodMes(s: String?) {
-        MaterialAlertDialogBuilder(this, R.style.MyAlertDialogTheme)
-            .setTitle("AlertDialogExample")
-            .setMessage(s ?: "")
-            .setCancelable(false)
-            .setPositiveButton("Proceed") { dialog, _ -> dialog.dismiss() }
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
-            .show()
+        runOnUiThread {
+            MaterialAlertDialogBuilder(this, R.style.MyAlertDialogTheme)
+                .setTitle("AlertDialogExample")
+                .setMessage(s ?: "")
+                .setCancelable(false)
+                .setPositiveButton("Proceed") { dialog, _ -> dialog.dismiss() }
+                .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                .show()
+        }
     }
 }
 //https\://services.gradle.org/distributions/gradle-8.12.1-bin.zip

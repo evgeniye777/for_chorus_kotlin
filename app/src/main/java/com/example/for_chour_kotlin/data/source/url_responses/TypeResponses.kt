@@ -4,8 +4,10 @@ import com.example.for_chour_kotlin.data.source.url_responses.verif_options.Chec
 import com.example.for_chour_kotlin.data.source.url_responses.verif_options.InAccount
 import com.example.for_chour_kotlin.data.source.url_responses.verif_options.UploadingGroupData
 import com.example.for_chour_kotlin.data.source.url_responses.verif_options.UploadingParticipantsData
+import com.example.for_chour_kotlin.data.source.url_responses.verif_options.UploadingStPersonsSinch
 import com.example.for_chour_kotlin.data.source.url_responses.verif_options.UploadingUpdatesGroups
 import com.example.for_chour_kotlin.data.source.url_responses.verif_options.UploadingUpdatesParticipants
+import com.example.for_chour_kotlin.data.source.url_responses.verif_options.UploadingUpdatesStPersonsSinch
 
 class TypeResponses {
     val localDataAY: LocalDataAY = LocalDataAY()
@@ -48,6 +50,16 @@ class TypeResponses {
     fun uploadingUpdatesParticipants(hash_name_group:String,list_versions:String,onSuccess: () -> Unit, onFailure: () -> Unit) {
         val uploadingUpdatesParticipants = UploadingUpdatesParticipants()
         uploadingUpdatesParticipants.start(hash_name_group,list_versions,onSuccess, onFailure)
+    }
+
+    fun uploadingStPersonsSinch(hash_name_group:String,onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val uploadingStPersonsSinch = UploadingStPersonsSinch()
+        uploadingStPersonsSinch.start(hash_name_group,onSuccess, onFailure)
+    }
+
+    fun uploadingUpdatesStPersonsSinch(hash_name_group:String,last_index:String,onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val uploadingUpdatesStPersonsSinch = UploadingUpdatesStPersonsSinch()
+        uploadingUpdatesStPersonsSinch.start(hash_name_group,last_index,onSuccess, onFailure)
     }
 }
 

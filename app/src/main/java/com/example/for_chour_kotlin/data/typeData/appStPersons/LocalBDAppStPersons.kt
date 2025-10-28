@@ -24,7 +24,7 @@ class LocalBDAppStPersons(
             createTable(nameTable)
         }
         val cursor: Cursor = database.rawQuery(
-            "SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY date ORDER BY date_write DESC, id DESC) AS rn FROM $nameTable) WHERE rn = 1",
+            "SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY date ORDER BY date_write DESC, id DESC) AS rn FROM $nameTable) WHERE rn = 1 ORDER BY id",
             null
         )
         val appstpersonssinches = mutableListOf<AppStPersons>()

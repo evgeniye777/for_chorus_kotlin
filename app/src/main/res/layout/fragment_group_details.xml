@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".GroupDetailsFragment">
+    tools:context="com.example.for_chour_kotlin.presentations.fragments.group_details.GroupDetailsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

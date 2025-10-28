@@ -1,7 +1,7 @@
 package com.example.for_chour_kotlin.data.typeData.appDataParticipant
 
 data class AppDataParticipant(
-    var id: Int = 0,
+    var id: Int = -1,
     var idC: String,
     var version: Int = -1,
     var hashName: String? = null,

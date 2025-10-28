@@ -39,7 +39,7 @@
                     android:layout_width="50sp"
                     android:layout_height="30sp"
                     android:background="@color/whitenIvisible"
-                    android:src="@drawable/img_v_calendar_hide"
+                    android:src="@drawable/img_v_calendar_visible"
                     android:scaleType="fitCenter"
                     android:layout_marginEnd="15dp"
                     />

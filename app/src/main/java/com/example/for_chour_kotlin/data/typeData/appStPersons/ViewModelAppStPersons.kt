@@ -17,6 +17,9 @@ class ViewModelAppStPersons() : ViewModel(), DataOperations<AppStPersons> {
     private val _groups = MutableLiveData<List<AppStPersons>?>()
     val stPersons: LiveData<List<AppStPersons>?> get() = _groups
 
+    private val _lastId =  MutableLiveData<Int>();
+    val lastId: LiveData<Int> get() = _lastId
+
     lateinit var nameTable: String
 
     // Метод для подключения к таблице(создает при отстутствии)
@@ -31,7 +34,22 @@ class ViewModelAppStPersons() : ViewModel(), DataOperations<AppStPersons> {
         localbdAppStPersons = LocalBDAppStPersons(database!!)
         repositoryAppStPersons = RepositoryAppStPersons(_groups)
         repositoryAppStPersons?.setItems(localbdAppStPersons!!.readItems(nameTable))
+        _lastId.value = _groups.value?.lastOrNull()?.id?: 0
         return 1
+    }
+
+    fun rereadIt(): Int {
+        if (database != null&& nameTable.isNotEmpty()) {
+
+            localbdAppStPersons = LocalBDAppStPersons(database!!)
+            repositoryAppStPersons = RepositoryAppStPersons(_groups)
+            repositoryAppStPersons?.setItems(localbdAppStPersons!!.readItems(nameTable))
+            _lastId.value = _groups.value?.lastOrNull()?.id ?: 0
+            return 1
+        }
+        else {
+            return -1
+        }
     }
 
     // Метод для добавления данных в таблицы
@@ -78,6 +96,14 @@ class ViewModelAppStPersons() : ViewModel(), DataOperations<AppStPersons> {
             repositoryAppStPersons?.deleteItem(item)
         }
         return n
+    }
+
+    fun removeItemsWithIdLessOrEqualZero() {
+        val currentList = _groups.value ?: return
+        val itemsToRemove = currentList.filter { it.id <= 0 }
+        for (item in itemsToRemove) {
+            destroyItem(item)
+        }
     }
 
     // Метод для удаления таблиц

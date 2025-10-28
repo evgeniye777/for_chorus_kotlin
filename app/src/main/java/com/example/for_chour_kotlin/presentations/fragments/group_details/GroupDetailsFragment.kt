@@ -1,5 +1,6 @@
 package com.example.for_chour_kotlin.presentations.fragments.group_details
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.for_chour_kotlin.data.source.url_responses.AccountHolder
 import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
 import com.example.for_chour_kotlin.data.typeData.appAllGroups.AppAllGroups
 import com.example.for_chour_kotlin.data.typeData.appAllGroups.ViewModelAppAllGroups
@@ -47,6 +49,7 @@ class GroupDetailsFragment : Fragment() {
 
         // Observe LiveData
         observeData()
+
     }
 
     private fun initRecyclerViews() {
@@ -88,6 +91,7 @@ class GroupDetailsFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateGroupData(group: AppAllGroups?) {
         if (group == null) {
             binding.tvGroupName.text = "Нет выбранной группы"
@@ -99,7 +103,9 @@ class GroupDetailsFragment : Fragment() {
 
         binding.tvDateCreate.text = "Дата создания: ${group.date_create ?: "Не указано"}"
         binding.tvLocation.text = "Место: ${group.location ?: "Не указано"}"
-        binding.tvCreator.text = "Создатель: ${group.creator ?: "Не указано"}"
+
+        val nameCreator = AuthorizationState.participants?.participants?.value?.find { it.hashName == group.creator }?.pName
+        binding.tvCreator.text = "Создал: ${nameCreator ?: "Не указано"}"
 
         // listNameBases
         nameBasesAdapter.submitList(group.listNameBases)
@@ -112,6 +118,14 @@ class GroupDetailsFragment : Fragment() {
         val hasData = !group.data.isNullOrEmpty()
         binding.tvDataTitle.visibility = if (hasData) View.VISIBLE else View.GONE
         binding.rvData.visibility = if (hasData) View.VISIBLE else View.GONE
+
+        //Скрываем данные которые не доступны ниже 5 уровня
+        if (!AccountHolder.access.equals("5")) {
+            binding.tvNameBasesTitle.visibility = View.GONE
+            binding.rvNameBases.visibility = View.GONE
+            binding.tvDataTitle.visibility = View.GONE
+            binding.rvData.visibility = View.GONE
+        }
     }
 
     private fun updateParticipantsData(participants: List<AppDataParticipant>?) {

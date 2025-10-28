@@ -75,10 +75,11 @@ class MainActivity : AppCompatActivity() {
         )
 
 
+        AccountHolder.access = 4.toString();
 
         ManagerNavView(binding, this,this)
 
-        ManagerFragments(binding,this)
+        ManagerFragments(binding,this,supportFragmentManager)
     }
 
     fun vivod(s: String?) {

@@ -36,6 +36,14 @@ class ManagerNavView(val binding: ActivityMainBinding,val context: Context,val l
 
         //Активация кнопки открытия и закрытия шторки
         val openDrawerImageView: ImageView = binding.idAppBarMain.idOpenDrawer
+        openDrawerImageView.setOnClickListener { view ->
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START)
+            }
+        }
+
         val navViewLayout = NavHeaderMainBinding.bind(navView.getHeaderView(0))
 
         val loginLabel = navViewLayout.idLoginLabel
@@ -74,14 +82,6 @@ class ManagerNavView(val binding: ActivityMainBinding,val context: Context,val l
                     {})
             }
 
-        }
-
-        openDrawerImageView.setOnClickListener { view ->
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START)
-            } else {
-                drawerLayout.openDrawer(GravityCompat.START)
-            }
         }
 
         val recyclerView = navViewLayout.idGroupsListName

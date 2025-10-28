@@ -16,7 +16,7 @@ class MakeStatus(
             if (!(participant.allowed in 0..1 && (purpose == 0 || purpose == 4 || purpose == 5 || (purpose == 3 && participant.allowed == 1) || participant.pGender == purpose))) {
                 R.drawable.rect_gone
             } else {
-                if (appStPersons==null) {
+                if (appStPersons==null||appStPersons.sinch==0) {
                     R.drawable.rect1
                 }
                 else {R.drawable.rect_not}

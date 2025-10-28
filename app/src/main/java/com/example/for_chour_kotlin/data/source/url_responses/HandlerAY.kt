@@ -74,6 +74,11 @@ class HandlerAY(val localDataAY: LocalDataAY?) {
                             allSuccess = false
                         }
                     }
+                    "addRecordStPersonsSinch" -> {
+                        if (!stPersonsHandler.handle(jsonObject)) {
+                            allSuccess = false
+                        }
+                    }
                     else -> {
                         Log.w("ServerResponse", "Unknown typedata: $typedata")
                         allSuccess = false

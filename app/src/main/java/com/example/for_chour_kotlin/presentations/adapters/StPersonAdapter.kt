@@ -71,13 +71,13 @@ class StPersonsAdapter(
             appStPersons
         }
     }
-    fun createAppStPersons(committer: String?, date: String): AppStPersons? {
+    fun createAppStPersons(committer: String?, date: String,recommendedId: Int): AppStPersons? {
         val makeStatus = MakeStatus(appStPersons)
         val newData = participants.associate { participant ->
             participant.idC to makeStatus.getDataFromAdapter(participant, purpose, statusMap[participant.idC] ?: false)
         }
         appStPersons = AppStPersons(
-            id = -1,
+            id = recommendedId,
             committer = committer,
             date = date, dateWrite = "", purpose = purpose, c = HashMap(newData))
         this.appStPersons = appStPersons

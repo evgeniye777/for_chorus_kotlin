@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.for_chour_kotlin.R
-import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
+import com.example.for_chour_kotlin.data.source.url_responses.AccountHolder
 import com.example.for_chour_kotlin.data.typeData.appDataParticipant.AppDataParticipant
 
 class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.ViewHolder>() {
@@ -32,6 +32,7 @@ class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.ViewHolder>
         return ViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val participant = participantsList[position]
         holder.tvPName.text = participant.pName ?: "Неизвестный участник"
@@ -50,6 +51,14 @@ class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.ViewHolder>
 
         holder.tvAllowed.text = "Разрешено: ${participant.allowed}"
         holder.tvAccess.text = "Доступ: ${participant.access}"
+
+        //Скрываем данные которые не доступны ниже 5 уровня
+        if (!AccountHolder.access.equals("5")) {
+            holder.tvPGender.visibility = View.GONE
+            holder.tvPost.visibility = View.GONE
+            holder.tvAllowed.visibility = View.GONE
+            holder.tvAccess.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int = participantsList.size

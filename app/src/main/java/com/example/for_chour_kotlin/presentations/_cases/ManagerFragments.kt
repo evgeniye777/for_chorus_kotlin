@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.for_chour_kotlin.R
+import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
 import com.example.for_chour_kotlin.databinding.ActivityMainBinding
 import com.example.for_chour_kotlin.databinding.MenuItemBottomBinding
 import com.example.for_chour_kotlin.presentations.fragments.attendance.AttendanceFragment
@@ -60,11 +61,13 @@ class ManagerFragments(val binding: ActivityMainBinding,val context: Context, va
 
         val myLinear_menu_sours: LinearLayout = menuBottomContent[0].menuLinear
         myLinear_menu_sours.setOnClickListener {
+            AuthorizationState.stateIn = 1
             changeColorTextImage(0)
             replaceFragment(GroupDetailsFragment(), "ATTENDANCE_FRAGMENT")
         }
         val myLinear_menu_like: LinearLayout = menuBottomContent[1].menuLinear
         myLinear_menu_like.setOnClickListener {
+            AuthorizationState.stateIn = 2
             changeColorTextImage(1)
             val fragment = AttendanceFragment()
             statusMenu = false
@@ -73,6 +76,7 @@ class ManagerFragments(val binding: ActivityMainBinding,val context: Context, va
         }
         val myLinear_menu_responses: LinearLayout = menuBottomContent[2].menuLinear
         myLinear_menu_responses.setOnClickListener {
+            AuthorizationState.stateIn = 3
             changeColorTextImage(2)
             replaceFragment(WebViewFragment(), "RESPONSES_FRAGMENT")
         }

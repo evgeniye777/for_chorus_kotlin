@@ -38,8 +38,10 @@ class ManagerNavView(val binding: ActivityMainBinding,val context: Context,val l
         val openDrawerImageView: ImageView = binding.idAppBarMain.idOpenDrawer
         openDrawerImageView.setOnClickListener { view ->
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                AuthorizationState.restoreStateIn()
                 drawerLayout.closeDrawer(GravityCompat.START)
             } else {
+                AuthorizationState.stateIn = 0
                 drawerLayout.openDrawer(GravityCompat.START)
             }
         }

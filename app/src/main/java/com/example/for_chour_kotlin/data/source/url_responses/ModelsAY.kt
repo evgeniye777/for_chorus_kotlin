@@ -85,7 +85,16 @@ object AuthorizationState {
 
     var typeResponses: TypeResponses? = null
 
-    var stateIn: Boolean? = false
+    var stateIn: Int? = null  // 0 - меню; 1 - F_Data; 2 - F_StPersons; 3 - StSongs
+        get() = field  // Стандартный getter
+        set(value) {
+            stateInLast = field  // Сохраняем прошлое значение в stateInLast перед установкой нового
+            field = value
+        }
+    var stateInLast: Int? = null
+    fun restoreStateIn() {
+        stateIn = stateInLast
+    }
 
     var groups: ViewModelAppAllGroups? = null
     var participants: ViewModelAppDataParticipant? = null
@@ -98,5 +107,7 @@ object AuthorizationState {
         mainActivity =null
         typeResponses = null
         groups = null
+        participants = null
+        stPersons = null
     }
 }

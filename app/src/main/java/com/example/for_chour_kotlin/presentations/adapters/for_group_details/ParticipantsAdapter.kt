@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.data.source.url_responses.AccountHolder
 import com.example.for_chour_kotlin.data.typeData.appDataParticipant.AppDataParticipant
+import com.example.for_chour_kotlin.presentations.dialogs.DialogParticipantEdit
 
 class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.ViewHolder>() {
     private var participantsList: List<AppDataParticipant> = emptyList()
@@ -58,6 +59,16 @@ class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.ViewHolder>
             holder.tvPost.visibility = View.GONE
             holder.tvAllowed.visibility = View.GONE
             holder.tvAccess.visibility = View.GONE
+        }
+
+        holder.itemView.setOnClickListener {
+            val dialog = DialogParticipantEdit(
+                holder.itemView.context,
+                participant,
+                position,
+                this
+            )  // this - адаптер
+            dialog.show()
         }
     }
 

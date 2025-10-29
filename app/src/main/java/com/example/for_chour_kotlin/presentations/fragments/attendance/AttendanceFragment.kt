@@ -30,9 +30,9 @@ import androidx.core.view.isVisible
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
+import com.example.for_chour_kotlin.presentations.activities.MainActivity
 import com.example.the_planner_semen.my_menu.FragmentMenu
 import com.example.the_planner_semen.my_menu.InterfaceMenu
-
 
 class AttendanceFragment : Fragment(), OnDataListener {
     private val groups: ViewModelAppAllGroups by activityViewModels()
@@ -50,7 +50,6 @@ class AttendanceFragment : Fragment(), OnDataListener {
     private var adapter: StPersonsAdapter? = null
     private var selectedDate: String = ""
     private var groupHash: String? = null
-
     private var selectedStPersons: AppStPersons? = null
 
     override fun onCreateView(
@@ -69,6 +68,9 @@ class AttendanceFragment : Fragment(), OnDataListener {
         recyclerView = binding.gvMain
         calendar = binding.calendar
 
+        // Восстановление selectedDate из savedInstanceState
+        selectedDate = savedInstanceState?.getString("selectedDate") ?: formatDate(System.currentTimeMillis())
+
         initializeData()
 
         // Инициализируем слушатели
@@ -80,33 +82,31 @@ class AttendanceFragment : Fragment(), OnDataListener {
     }
 
     private fun initializeData() {
-        val nameTable = AuthorizationState.groups?.focus?.value?.listNameBases?.get("st_persons_sinch") ?:"";
+        if (!isAdded) return  // Проверка, что фрагмент attached
+
+        val nameTable = AuthorizationState.groups?.focus?.value?.listNameBases?.get("st_persons_sinch") ?: ""
 
         if (nameTable.isEmpty()) {
-            AuthorizationState.mainActivity?.vivod("Ошибка чтения данных"); return}
+            (requireActivity() as MainActivity).vivod("Ошибка чтения данных")  // Замена на requireActivity()
+            return
+        }
 
         stPersons.connection(AuthorizationState.database, nameTable)
-
         AuthorizationState.stPersons = stPersons
-
         groupHash = groups.focus.value?.hashName
 
-
-        if (stPersons.stPersons.value?.isNotEmpty() ?: false) {
-
+        if (stPersons.stPersons.value?.isNotEmpty() == true) {
             val last_index: String? = stPersons.stPersons.value?.lastOrNull()?.id?.toString()
-
-            if (groupHash!=null&& last_index!=null) {
-                AuthorizationState.typeResponses?.uploadingUpdatesStPersonsSinch(groupHash!!,last_index, {
-                    //Вторичный конект
-                    stPersons.rereadIt() }, {})
+            if (groupHash != null && last_index != null) {
+                AuthorizationState.typeResponses?.uploadingUpdatesStPersonsSinch(groupHash!!, last_index, {
+                    if (isAdded) stPersons.rereadIt()  // Проверка перед вызовом
+                }, {})
             }
-        }
-        else {
+        } else {
             groupHash?.let {
                 AuthorizationState.typeResponses?.uploadingStPersonsSinch(it, {
-                    //Вторичный конект
-                    stPersons.connection(AuthorizationState.database, nameTable)}, {})
+                    if (isAdded) stPersons.connection(AuthorizationState.database, nameTable)  // Проверка
+                }, {})
             }
         }
 
@@ -122,6 +122,8 @@ class AttendanceFragment : Fragment(), OnDataListener {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeView() {
+        if (!isAdded) return  // Проверка
+
         highlightDatesInCalendar()
         clickCalendar(selectedDate)
 
@@ -143,16 +145,17 @@ class AttendanceFragment : Fragment(), OnDataListener {
         }
     }
 
-
     private fun clickCalendar(selectedDate: String) {
         idTextDate.text = selectedDate
         val stPersonsDate = stPersons.stPersons.value?.find { it.date == selectedDate }
         loadRecord(stPersonsDate)
         clickButtonOpenCalendar(false)
     }
+
     private fun loadRecord(record: AppStPersons?) {
-        if (record!=null)
-        {
+        if (!isAdded) return  // Проверка
+
+        if (record != null) {
             spinnerPurpose.setSelection(record.purpose)
             adapter = StPersonsAdapter(
                 participants.participants.value ?: listOf(),
@@ -164,78 +167,76 @@ class AttendanceFragment : Fragment(), OnDataListener {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
-            AuthorizationState.mainActivity?.vivodMes("$record")
+            (requireActivity() as MainActivity).vivodMes("$record")
 
-            if (record.sinch == 0) {
-                managerState(1)
-            } else if (record.sinch == 1) {
-                managerState(2)
-            } else if (record.sinch == 2) {
-                managerState(3)
+            when (record.sinch) {
+                0 -> managerState(1)
+                1 -> managerState(2)
+                2 -> managerState(3)
             }
-        }
-        else {
+        } else {
             managerState(0)
         }
     }
 
     private fun onCreateButtonClick() {
+        if (!isAdded) return  // Проверка
+
         val committer = AccountHolder.hashName
         adapter = StPersonsAdapter(participants.participants.value ?: listOf(), spinnerPurpose.selectedItemId.toInt(), null, this)
         recyclerView.adapter = adapter
         val id_reverse: Int? = stPersons.stPersons.value?.firstOrNull()?.id?.minus(1)
 
         if (id_reverse != null) {
-            val newRecord = adapter?.createAppStPersons(
-                committer,
-                selectedDate,
-                id_reverse
-            )
+            val newRecord = adapter?.createAppStPersons(committer, selectedDate, id_reverse)
             if (newRecord != null) {
                 newRecord.sinch = 0
                 stPersons.addItem(newRecord)
                 selectedStPersons = newRecord
                 loadRecord(newRecord)
             }
-        }
-        else {
-            AuthorizationState.mainActivity?.vivod("Ошибка создания")
+        } else {
+            (requireActivity() as MainActivity).vivod("Ошибка создания")  // Замена
         }
     }
 
     private fun onWriteButtonClick() {
+        if (!isAdded || adapter == null) return  // Проверка
 
-        if (adapter != null) {
+        try {
             if (adapter!!.initAppStPersons()) {
                 val appStPersons = adapter!!.getAppStPersons()
                 appStPersons?.sinch = 1
-                if (appStPersons != null && stPersons.addOrUpdateItem(appStPersons) >=1) {
+                if (appStPersons != null && stPersons.addOrUpdateItem(appStPersons) >= 1) {
                     adapter!!.update()
                     selectedStPersons = appStPersons
+                } else {
+                    (requireActivity() as MainActivity).vivod("Ошибка сохранения")  // Замена
                 }
-                else {
-                    AuthorizationState.mainActivity?.vivod("Ошибка сохранения")
-                }
-            }
-            else {
-                val appStPersons = adapter!!.createAppStPersons(AccountHolder.hashName,
-                    idTextDate.text as String, stPersons.stPersons.value?.last()?.id?.plus(1) ?:-1
+            } else {
+                val appStPersons = adapter!!.createAppStPersons(
+                    AccountHolder.hashName,
+                    idTextDate.text.toString(),
+                    stPersons.stPersons.value?.last()?.id?.plus(1) ?: -1
                 )
                 appStPersons?.sinch = 1
-                if (appStPersons!=null && stPersons.addOrUpdateItem(appStPersons) >=1) {
+                if (appStPersons != null && stPersons.addOrUpdateItem(appStPersons) >= 1) {
                     adapter!!.update()
                     selectedStPersons = appStPersons
-                }
-                else {
-                    AuthorizationState.mainActivity?.vivod("Ошибка сохранения")
+                } else {
+                    (requireActivity() as MainActivity).vivod("Ошибка сохранения")  // Замена
                 }
             }
             managerState(2)
+        } catch (e: Exception) {
+            (requireActivity() as MainActivity).vivod("Ошибка записи: ${e.message}")  // Обработка исключений
         }
     }
 
     private fun setupSpinner() {
         groups.focus.observe(viewLifecycleOwner) { focus ->
+            if (!isAdded) return@observe  // Проверка, что фрагмент attached
+
             val purposes = focus?.data?.find { it.type == "purposes" }?.data
             val adapterSpinner = ArrayAdapter(
                 requireContext(),
@@ -245,19 +246,35 @@ class AttendanceFragment : Fragment(), OnDataListener {
             adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerPurpose.adapter = adapterSpinner
 
-            spinnerPurpose.setSelection(selectedStPersons?.purpose?: 0)
+            // Безопасная установка selection: проверка на пустой список
+            val selectionIndex = selectedStPersons?.purpose ?: 0
+            if (purposes != null && purposes.isNotEmpty() && selectionIndex < purposes.size) {
+                spinnerPurpose.setSelection(selectionIndex)
+            } else {
+                spinnerPurpose.setSelection(0)  // Или не устанавливать, если список пустой
+            }
 
             spinnerPurpose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    val selectedPurposeId = purposes?.get(position)?.id?.toIntOrNull() ?: 0
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                    try {
+                        // Проверка на null и диапазон перед доступом
+                        if (purposes != null && position >= 0 && position < purposes.size) {
+                            val selectedPurposeId = purposes[position].id?.toIntOrNull() ?: 0
+                            // Используйте selectedPurposeId по необходимости (например, обновить adapter)
+                        }
+                    } catch (e: Exception) {
+                        // Логирование или обработка ошибки
+                        (requireActivity() as MainActivity).vivod("Ошибка в onItemSelected: ${e.message}")
+                    }
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
-                    // Handle nothing selected
+                    // Ничего не делать
                 }
             }
         }
     }
+
 
     private fun initOpenCalendar() {
         calendar.visibility = View.GONE
@@ -266,8 +283,8 @@ class AttendanceFragment : Fragment(), OnDataListener {
         }
     }
 
-    private fun clickButtonOpenCalendar (state: Boolean? = null) {
-        if (state==null&&calendar.isGone) {
+    private fun clickButtonOpenCalendar(state: Boolean? = null) {
+        if (state == null && calendar.isGone) {
             binding.calendar.visibility = View.VISIBLE
             openCalendar.setImageResource(R.drawable.img_v_calendar_hide)
         } else {
@@ -279,7 +296,11 @@ class AttendanceFragment : Fragment(), OnDataListener {
     private fun installCalendar() {
         val today = System.currentTimeMillis()
         calendar.date = today
-        selectedDate = formatDate(today)
+
+        if (selectedDate.isEmpty()) {
+            selectedDate = formatDate(today)
+        }
+
         idTextDate.text = selectedDate
     }
 
@@ -298,12 +319,10 @@ class AttendanceFragment : Fragment(), OnDataListener {
         return x >= calendarX && x <= calendarX + width && y >= calendarY && y <= calendarY + height
     }
 
-    override fun onDataUpdate(counts: Triple<Int, Int, Int>) {
-    }
-
+    override fun onDataUpdate(counts: Triple<Int, Int, Int>) {}
 
     private fun managerState(state: Int) {
-        //0 - нет записи; 1 - запись создана, но не записана в базу; 2 - Запись добавлена; 3 - запись отправлена
+        // 0 - нет записи; 1 - запись создана, но не записана в базу; 2 - Запись добавлена; 3 - запись отправлена
         when (state) {
             0 -> {
                 butCreate.visibility = View.VISIBLE
@@ -311,7 +330,6 @@ class AttendanceFragment : Fragment(), OnDataListener {
                 butWrite.isEnabled = false
                 spinnerPurpose.isEnabled = false
             }
-
             1 -> {
                 butCreate.visibility = View.GONE
                 recyclerView.visibility = View.VISIBLE
@@ -319,7 +337,6 @@ class AttendanceFragment : Fragment(), OnDataListener {
                 butWrite.text = "Записать"
                 spinnerPurpose.isEnabled = true
             }
-
             2 -> {
                 butCreate.visibility = View.GONE
                 recyclerView.visibility = View.VISIBLE
@@ -336,57 +353,57 @@ class AttendanceFragment : Fragment(), OnDataListener {
             }
         }
     }
-
     var menuFragment: FragmentMenu  = init_my_mune()
-    private fun init_my_mune():FragmentMenu {
-        val items = listOf("Отправить запись","Удалить запись")
+    private fun init_my_mune(): FragmentMenu {
+        val items = listOf("Отправить запись", "Удалить запись")
         val fragmentMenu = FragmentMenu()
-        fragmentMenu.getDate(items,object : InterfaceMenu.OnItemClickListener {
+        fragmentMenu.getDate(items, object : InterfaceMenu.OnItemClickListener {
             override fun onItemClick(position: Int) {
+                if (!isAdded) return  // Проверка, что фрагмент attached
+
                 when (position) {
                     0 -> {
                         try {
                             groupHash = groups.focus.value?.hashName
-
                             val last_index: String = stPersons.lastId.value.toString()
-
                             if (groupHash != null && selectedStPersons != null) {
                                 AuthorizationState.typeResponses?.sendStPersonsData(
                                     groupHash!!, last_index, selectedStPersons!!, {
-                                        //Вторичный конект
-                                        stPersons.destroyItem(selectedStPersons!!)
-                                        stPersons.rereadIt()
-                                        clickCalendar(selectedDate)
-                                        AuthorizationState.mainActivity?.vivodMes("Данные синхронизированы")
+                                        if (isAdded) {
+                                            stPersons.destroyItem(selectedStPersons!!)
+                                            stPersons.rereadIt()
+                                            clickCalendar(selectedDate)
+                                            (requireActivity() as MainActivity).vivodMes("Данные синхронизированы")  // Замена на requireActivity()
+                                        }
                                     }, {
-                                        AuthorizationState.mainActivity?.vivodMes("Ошибка sendStPersonsData")
+                                        (requireActivity() as MainActivity).vivodMes("Ошибка sendStPersonsData")  // Замена
                                     })
                             } else {
-                                AuthorizationState.mainActivity?.vivodMes("Ошибка null groupHash || selectedStPersons")
+                                (requireActivity() as MainActivity).vivodMes("Ошибка null groupHash || selectedStPersons")  // Замена
                             }
-                        }catch (_:Exception) {
-                                AuthorizationState.mainActivity?.vivodMes("Ошибка отправки")
-                            }
+                        } catch (_: Exception) {
+                            (requireActivity() as MainActivity).vivodMes("Ошибка отправки")  // Замена
+                        }
                     }
                     1 -> {
                         try {
-                            if (selectedStPersons!=null) {
-                                if (selectedStPersons!!.sinch!=2) {
+                            if (selectedStPersons != null) {
+                                if (selectedStPersons!!.sinch != 2) {
                                     stPersons.deleteItem(selectedStPersons!!)
                                     clickCalendar(selectedDate)
-                                    AuthorizationState.mainActivity?.vivodMes("Запись удалена")
-                                }else {
-                                    AuthorizationState.mainActivity?.vivodMes("Нельзя удалить синхронизированную запись")
+                                    (requireActivity() as MainActivity).vivodMes("Запись удалена")  // Замена
+                                } else {
+                                    (requireActivity() as MainActivity).vivodMes("Нельзя удалить синхронизированную запись")  // Замена
                                 }
+                            } else {
+                                (requireActivity() as MainActivity).vivodMes("Нет записи")  // Замена
                             }
-
-                            else {AuthorizationState.mainActivity?.vivodMes("Нет записи")}
-                        }
-                        catch (_:Exception) {
-                            AuthorizationState.mainActivity?.vivodMes("Ошибка удаления")
+                        } catch (_: Exception) {
+                            (requireActivity() as MainActivity).vivodMes("Ошибка удаления")  // Замена
                         }
                     }
                     else -> {
+                        // Ничего не делать
                     }
                 }
             }
@@ -394,11 +411,17 @@ class AttendanceFragment : Fragment(), OnDataListener {
         return fragmentMenu
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("selectedDate", selectedDate)  // Сохранение selectedDate для восстановления после поворота
+    }
+
     override fun onResume() {
         super.onResume()
-        if (groupHash !=groups.focus.value?.hashName) {
+        if (groupHash != groups.focus.value?.hashName) {
             initializeData()
             initializeView()
         }
     }
 }
+

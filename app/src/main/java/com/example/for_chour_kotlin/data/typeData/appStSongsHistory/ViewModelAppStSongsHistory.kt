@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.for_chour_kotlin.data.typeData._interfaces.DataOperations
+import com.example.for_chour_kotlin.data.typeData.appStPersons.AppStPersons
 
 class ViewModelAppStSongsHistory() : ViewModel(), DataOperations<AppStSongsHistory> {
 
@@ -50,6 +51,18 @@ class ViewModelAppStSongsHistory() : ViewModel(), DataOperations<AppStSongsHisto
         return n
     }
 
+    override fun addOrUpdateItem(item: AppStSongsHistory): Int {
+        val currentList = _groups.value ?: emptyList()
+        //удаление схожих item по дате
+        deleteItemsDatesThatMatch(item)
+        val existingItem = currentList.find { it.id == item.id }
+        return if (existingItem != null) {
+            updateItem(item)
+        } else {
+            addItem(item)
+        }
+    }
+
     // Метод для неполного удаления данных из таблиц
     override fun deleteItem(item: AppStSongsHistory): Int {
         val n: Int = localbdAppStSongsHistory?.deleteItem(item) ?: -1
@@ -66,6 +79,18 @@ class ViewModelAppStSongsHistory() : ViewModel(), DataOperations<AppStSongsHisto
             repositoryAppStSongsHistory?.deleteItem(item)
         }
         return n
+    }
+
+    fun deleteItemsDatesThatMatch(item: AppStSongsHistory): Int {
+        val currentList = _groups.value ?: emptyList()
+        // Находим все item'ы с совпадающей датой, исключая переданный item (чтобы не удалить его самого)
+        val itemsToDelete = currentList.filter { it.id != item.id && it.date == item.date }
+        var totalDeleted = 0
+        // Удаляем каждый найденный item, используя готовый метод deleteItem
+        for (itemToDelete in itemsToDelete) {
+            totalDeleted += deleteItem(itemToDelete)
+        }
+        return totalDeleted
     }
 
     // Метод для удаления таблиц

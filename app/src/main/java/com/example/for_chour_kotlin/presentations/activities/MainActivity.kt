@@ -1,15 +1,11 @@
 package com.example.for_chour_kotlin.presentations.activities
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.example.for_chour_kotlin.R
 import com.example.for_chour_kotlin.data.source.url_responses.TypeResponses
 import com.example.for_chour_kotlin.data.typeData._cases.ConnectSQLite
@@ -17,7 +13,6 @@ import com.example.for_chour_kotlin.data.source.url_responses.AccountHolder
 import com.example.for_chour_kotlin.data.source.url_responses.AuthorizationState
 import com.example.for_chour_kotlin.data.typeData.appAllGroups.ViewModelAppAllGroups
 import com.example.for_chour_kotlin.data.typeData.appDataParticipant.ViewModelAppDataParticipant
-import com.example.for_chour_kotlin.data.typeData.appStPersons.ViewModelAppStPersons
 import com.example.for_chour_kotlin.databinding.ActivityMainBinding
 import com.example.for_chour_kotlin.presentations._cases.ManagerFragments
 import com.example.for_chour_kotlin.presentations._cases.ManagerNavView
@@ -34,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

@@ -370,7 +370,6 @@ class AttendanceFragment : Fragment(), OnDataListener {
                                 AuthorizationState.typeResponses?.sendStPersonsData(
                                     groupHash!!, last_index, selectedStPersons!!, {
                                         if (isAdded) {
-                                            stPersons.destroyItem(selectedStPersons!!)
                                             stPersons.rereadIt()
                                             clickCalendar(selectedDate)
                                             (requireActivity() as MainActivity).vivodMes("Данные синхронизированы")  // Замена на requireActivity()
@@ -393,7 +392,7 @@ class AttendanceFragment : Fragment(), OnDataListener {
                                     clickCalendar(selectedDate)
                                     (requireActivity() as MainActivity).vivodMes("Запись удалена")  // Замена
                                 } else {
-                                    (requireActivity() as MainActivity).vivodMes("Нельзя удалить синхронизированную запись")  // Замена
+                                    (requireActivity() as MainActivity).vivodMes("Нельзя удалить/изменить синхронизированную запись")  // Замена
                                 }
                             } else {
                                 (requireActivity() as MainActivity).vivodMes("Нет записи")  // Замена

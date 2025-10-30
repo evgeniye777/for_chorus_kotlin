@@ -51,8 +51,20 @@ class LocalBDAppStSongsHistory(
         return appstsongshistory
     }
 
+    private fun existsById(id: Int): Boolean {
+        if (id < 0) return false
+        val query = "SELECT id FROM $nameTable WHERE id = ? LIMIT 1"
+        val cursor = database.rawQuery(query, arrayOf(id.toString()))
+        return try {
+            cursor.moveToFirst()
+        } finally {
+            cursor.close()
+        }
+    }
+
     // Добавление данных в таблицу
     override fun addItem(item: AppStSongsHistory): Int {
+        if (existsById(item.id)) {return updateItem(item);}
         val values = ContentValues().apply {
             put("committer", item.committer)
             put("date_write", item.dateWrite)

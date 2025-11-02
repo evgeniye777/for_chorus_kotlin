@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:autoMirrored="true"
+    android:height="24dp"
+    android:viewportHeight="24"
+    android:viewportWidth="24"
+    android:width="24dp">
+    <group
+        android:translateX="0.1"
+        android:translateY="-1">
+        <path
+            android:fillColor="@color/my_gray2"
+            android:pathData="M2,4h20c0.553,0 1,0.447 1,1v2c0,0.553 -0.447,1 -1,1H2c-0.553,0 -1,-0.447 -1,-1V5c0,-0.553 0.447,-1 1,-1z"
+            android:strokeColor="@color/my_gray2"
+            android:strokeWidth="0" />
+    </group>
+
+    <group
+        android:translateX="0.1"
+        android:translateY="6">
+        <path
+            android:fillColor="@color/my_gray2"
+            android:pathData="M2,4h20c0.553,0 1,0.447 1,1v2c0,0.553 -0.447,1 -1,1H2c-0.553,0 -1,-0.447 -1,-1V5c0,-0.553 0.447,-1 1,-1z"
+            android:strokeColor="@color/my_gray2"
+            android:strokeWidth="0" />
+    </group>
+
+    <group
+        android:translateX="0.1"
+        android:translateY="13">
+        <path
+            android:fillColor="@color/my_gray2"
+            android:pathData="M2,4h20c0.553,0 1,0.447 1,1v2c0,0.553 -0.447,1 -1,1H2c-0.553,0 -1,-0.447 -1,-1V5c0,-0.553 0.447,-1 1,-1z"
+            android:strokeColor="@color/my_gray2"
+            android:strokeWidth="0" />
+    </group>
+</vector>

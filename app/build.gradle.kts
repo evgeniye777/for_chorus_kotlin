@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.for_chour_kotlin"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.for_chour_kotlin"
+        applicationId = "com.example.for_chour_kotlin2"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.volley)
     implementation(libs.koin.android)
+    implementation(libs.gson)
+    implementation(libs.androidx.room.runtime.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

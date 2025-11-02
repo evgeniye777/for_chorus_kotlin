@@ -8,11 +8,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="whitenIvisible">#00FFFFFF</color>
 
     <color name="menu_click">#024FF2</color>
     <color name="menu_click_text">#538BFD</color>
     <color name="menu_not_click">#ABABB1</color>
     <color name="my_gray">#858688</color>
     <color name="my_gray2">#9F9F9F</color>
+    <color name="my_gray_light">#D5D5D5</color>
     <color name="but_respond">#4CB24E</color>
 </resources>

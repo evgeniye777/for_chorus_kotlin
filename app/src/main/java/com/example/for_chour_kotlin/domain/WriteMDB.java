@@ -13,6 +13,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.example.for_chour_kotlin.data.source.remote.ServerClass;
 import com.example.for_chour_kotlin.data.source.local.DataBases;
+import com.example.for_chour_kotlin.domain.entities.infoOnePerson;
+import com.example.for_chour_kotlin.domain.entities.infoOneRec;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -200,6 +202,35 @@ public class WriteMDB {
         ServerClass serverClass = new ServerClass();
         vivodMes(request.toString());
         serverClass.getRequestINSERT("WriteAll", request.toString());
+        return serverClass.postRequest(activity,context,null);
+    }
+
+    public String toSetOneDay(String day) {
+        StringBuilder request= new StringBuilder();
+        Cursor cursor;
+        cursor = mdb.rawQuery(
+                "SELECT * FROM app_st_persons_chorus63_sinch WHERE date = ? ORDER BY id DESC LIMIT 1",
+                new String[]{day});
+        cursor.moveToFirst();
+        int count = cursor.getColumnCount();
+        while (!cursor.isAfterLast()) {
+            for (int i=1;i<count;i++) {
+                String data = cursor.getString(i);
+                if (data!=null&&!data.isEmpty()) {
+                    request.append(cursor.getColumnName(i)).append("¦").append(cursor.getString(i)).append("¦¦");
+                }
+            }
+            if (request.length()>0) {
+                int lastIndex = request.lastIndexOf("¦¦");
+                if (lastIndex!=-1) {request.delete(lastIndex, lastIndex + 2);}
+                request.append("¦¦¦");
+            }
+            cursor.moveToNext();
+        }
+        cursor.close();
+        ServerClass serverClass = new ServerClass();
+        vivodMes(request.toString());
+        serverClass.getRequestINSERT("WriteOneDay", request.toString());
         return serverClass.postRequest(activity,context,null);
     }
 
